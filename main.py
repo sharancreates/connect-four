@@ -10,6 +10,7 @@ from connect4.core.board import PLAYER_1, PLAYER_2
 from connect4.agents.base import Agent
 from connect4.agents.random_agent import RandomAgent
 from connect4.agents.minimax_agent import MinimaxAgent
+from connect4.agents.alphabeta_agent import AlphaBetaAgent
 from connect4.cli.game_loop import CLIGameLoop, HumanPlayer
 
 
@@ -22,8 +23,10 @@ def create_agent(agent_type: str, name: str, player: int, depth: int, seed: int 
         return RandomAgent(name=name, player=player, seed=seed)
     elif agent_type == "minimax":
         return MinimaxAgent(name=name, player=player, depth=depth)
+    elif agent_type == "alphabeta":
+        return AlphaBetaAgent(name=name, player=player, depth=depth)
     else:
-        raise ValueError(f"Unknown agent type: '{agent_type}'. Supported: human, random, minimax.")
+        raise ValueError(f"Unknown agent type: '{agent_type}'. Supported: human, random, minimax, alphabeta.")
 
 
 def main() -> None:
@@ -39,13 +42,13 @@ def main() -> None:
     )
     parser.add_argument(
         "--agent1",
-        choices=["human", "random", "minimax"],
+        choices=["human", "random", "minimax", "alphabeta"],
         default="human",
         help="Player 1 type (X)",
     )
     parser.add_argument(
         "--agent2",
-        choices=["human", "random", "minimax"],
+        choices=["human", "random", "minimax", "alphabeta"],
         default="minimax",
         help="Player 2 type (O)",
     )
@@ -53,13 +56,13 @@ def main() -> None:
         "--depth1",
         type=int,
         default=4,
-        help="Search depth for Player 1 (if Minimax)",
+        help="Search depth for Player 1 (if Minimax or AlphaBeta)",
     )
     parser.add_argument(
         "--depth2",
         type=int,
         default=4,
-        help="Search depth for Player 2 (if Minimax)",
+        help="Search depth for Player 2 (if Minimax or AlphaBeta)",
     )
     parser.add_argument(
         "--delay",
