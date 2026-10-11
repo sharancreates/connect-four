@@ -11,10 +11,19 @@ from connect4.agents.base import Agent
 from connect4.agents.random_agent import RandomAgent
 from connect4.agents.minimax_agent import MinimaxAgent
 from connect4.agents.alphabeta_agent import AlphaBetaAgent
+from connect4.agents.iterative_agent import IterativeAlphaBetaAgent
 from connect4.cli.game_loop import CLIGameLoop, HumanPlayer
 
 
-def create_agent(agent_type: str, name: str, player: int, depth: int, seed: int | None = None) -> Agent:
+def create_agent(
+    agent_type: str,
+    name: str,
+    player: int,
+    depth: int,
+    seed: int | None = None,
+    time_limit: float = 1.0,
+    use_heuristic: bool = False,
+) -> Agent:
     """Factory creating an Agent instance based on type argument."""
     agent_type = agent_type.lower()
     if agent_type == "human":
@@ -24,9 +33,13 @@ def create_agent(agent_type: str, name: str, player: int, depth: int, seed: int 
     elif agent_type == "minimax":
         return MinimaxAgent(name=name, player=player, depth=depth)
     elif agent_type == "alphabeta":
-        return AlphaBetaAgent(name=name, player=player, depth=depth)
+        return AlphaBetaAgent(name=name, player=player, depth=depth, use_heuristic=use_heuristic)
+    elif agent_type == "iterative":
+        return IterativeAlphaBetaAgent(name=name, player=player, max_depth=depth, time_limit=time_limit)
     else:
-        raise ValueError(f"Unknown agent type: '{agent_type}'. Supported: human, random, minimax, alphabeta.")
+        raise ValueError(
+            f"Unknown agent type: '{agent_type}'. Supported: human, random, minimax, alphabeta, iterative."
+        )
 
 
 def main() -> None:
@@ -42,13 +55,13 @@ def main() -> None:
     )
     parser.add_argument(
         "--agent1",
-        choices=["human", "random", "minimax", "alphabeta"],
+        choices=["human", "random", "minimax", "alphabeta", "iterative"],
         default="human",
         help="Player 1 type (X)",
     )
     parser.add_argument(
         "--agent2",
-        choices=["human", "random", "minimax", "alphabeta"],
+        choices=["human", "random", "minimax", "alphabeta", "iterative"],
         default="minimax",
         help="Player 2 type (O)",
     )
@@ -56,13 +69,35 @@ def main() -> None:
         "--depth1",
         type=int,
         default=4,
-        help="Search depth for Player 1 (if Minimax or AlphaBeta)",
+        help="Search depth for Player 1 (max_depth if iterative)",
     )
     parser.add_argument(
         "--depth2",
         type=int,
         default=4,
-        help="Search depth for Player 2 (if Minimax or AlphaBeta)",
+        help="Search depth for Player 2 (max_depth if iterative)",
+    )
+    parser.add_argument(
+        "--time1",
+        type=float,
+        default=1.0,
+        help="Time budget in seconds per move for Player 1 (if iterative)",
+    )
+    parser.add_argument(
+        "--time2",
+        type=float,
+        default=1.0,
+        help="Time budget in seconds per move for Player 2 (if iterative)",
+    )
+    parser.add_argument(
+        "--heuristic1",
+        action="store_true",
+        help="Enable advanced heuristic evaluation for Player 1 (if alphabeta)",
+    )
+    parser.add_argument(
+        "--heuristic2",
+        action="store_true",
+        help="Enable advanced heuristic evaluation for Player 2 (if alphabeta)",
     )
     parser.add_argument(
         "--delay",
@@ -92,12 +127,36 @@ def main() -> None:
     # Configure agents based on selected mode
     if args.mode == "human-vs-agent":
         p1 = HumanPlayer("Human Player", player=PLAYER_1)
-        p2 = create_agent(args.agent2 if args.agent2 != "human" else "minimax", "AI Opponent", player=PLAYER_2, depth=args.depth2, seed=args.seed)
+        p2 = create_agent(
+            args.agent2 if args.agent2 != "human" else "minimax",
+            "AI Opponent",
+            player=PLAYER_2,
+            depth=args.depth2,
+            seed=args.seed,
+            time_limit=args.time2,
+            use_heuristic=args.heuristic2,
+        )
     elif args.mode == "agent-vs-agent":
         a1_type = args.agent1 if args.agent1 != "human" else "random"
         a2_type = args.agent2 if args.agent2 != "human" else "minimax"
-        p1 = create_agent(a1_type, f"Agent 1 ({a1_type.capitalize()})", player=PLAYER_1, depth=args.depth1, seed=args.seed)
-        p2 = create_agent(a2_type, f"Agent 2 ({a2_type.capitalize()})", player=PLAYER_2, depth=args.depth2, seed=None if args.seed is None else args.seed + 1)
+        p1 = create_agent(
+            a1_type,
+            f"Agent 1 ({a1_type.capitalize()})",
+            player=PLAYER_1,
+            depth=args.depth1,
+            seed=args.seed,
+            time_limit=args.time1,
+            use_heuristic=args.heuristic1,
+        )
+        p2 = create_agent(
+            a2_type,
+            f"Agent 2 ({a2_type.capitalize()})",
+            player=PLAYER_2,
+            depth=args.depth2,
+            seed=None if args.seed is None else args.seed + 1,
+            time_limit=args.time2,
+            use_heuristic=args.heuristic2,
+        )
     else:  # human-vs-human
         p1 = HumanPlayer("Player 1", player=PLAYER_1)
         p2 = HumanPlayer("Player 2", player=PLAYER_2)

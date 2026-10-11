@@ -1,6 +1,8 @@
 """Alpha-Beta Agent for Connect Four (same as plain Minimax, but with pruning)."""
+
 from connect4.core.board import COLS
 from connect4.agents.base import Agent
+from connect4.agents.heuristic import evaluate_board
 
 WIN = 100000
 LOSS = -100000
@@ -9,9 +11,12 @@ DRAW = 0
 
 class AlphaBetaAgent(Agent):
 
-    def __init__(self, name="AlphaBeta", player=1, depth=4):
+    def __init__(self, name="AlphaBeta", player=1, depth=4, use_heuristic=False):
         super().__init__(name=name, player=player)
         self.depth = depth
+        # False = simple center-only evaluation (fair comparison with plain minimax)
+        # True  = full heuristic from heuristic.py
+        self.use_heuristic = use_heuristic
 
     def order_moves(self, moves):
         # center columns first, pruning works better when good moves come first
@@ -106,8 +111,10 @@ class AlphaBetaAgent(Agent):
         return value
 
     def evaluate(self, board):
-        # same simple heuristic as plain minimax for now (center control)
-        # the proper heuristic comes in the next step
+        if self.use_heuristic:
+            return evaluate_board(board, self.player)
+
+        # simple evaluation: center control only
         center_col = board.grid[:, COLS // 2]
         mine = int((center_col == self.player).sum())
         theirs = int((center_col == -self.player).sum())
