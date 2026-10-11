@@ -44,3 +44,37 @@ Implement a reusable `MetricsTracker` context manager / wrapper in `connect4.ben
 
 ### Rationale
 Using standard library tools avoids heavy external dependencies while guaranteeing microsecond time accuracy and byte-level memory tracking.
+
+---
+
+## [DECISION-003] MCTS Search Budget & Playout Architecture
+
+**Date**: 2026-10-11
+**Status**: Accepted
+
+### Context
+Member 2 is implementing Monte Carlo Tree Search (MCTS with UCT). To fairly benchmark MCTS against depth-limited Alpha-Beta pruning, MCTS needs to operate under comparable resource and "thinking time" budgets.
+
+### Decision
+Support dual-mode budget allocation in `MCTSAgent`:
+1. `simulations: int` (e.g. 500-1000 rollouts per move) for deterministic rollout budgets.
+2. `time_limit: float` (e.g. 0.20s per move) using wall-clock time checking during tree search.
+Employ UCT selection with exploration constant $C_p = \sqrt{2} \approx 1.414$, random/light rollouts, and backpropagation of $\pm 1$ terminal utility.
+
+### Rationale
+Allows both reproducible step-based testing and realistic time-bounded competition against Alpha-Beta under equal thinking time constraints.
+
+---
+
+## [DECISION-004] Automated Multi-Game Benchmark & GUI Architecture
+
+**Date**: 2026-10-11
+**Status**: Accepted
+
+### Context
+Week 2 requires extending the benchmarking harness to auto-run many seeded agent-vs-agent matches and record win/draw/loss rates alongside node/simulation counts, as well as beginning the Pygame GUI skeleton.
+
+### Decision
+1. Create `connect4.benchmark.runner` (`BenchmarkRunner`) to orchestrate multi-game matches with alternating first-mover turns, random seeds, and tabular metric summaries.
+2. Build `connect4.gui.app` (`Connect4Pygame`) with visual 6x7 grid rendering, hover disc tracking, click-to-drop input, and turn management.
+

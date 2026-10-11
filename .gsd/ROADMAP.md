@@ -38,15 +38,15 @@ updated: 2026-10-10T14:45:00+05:30
 ---
 
 ### Phase 2: Advanced Algorithms & Heuristic Design (Week 2)
-**Status:** ⬜ Not Started
+**Status:** ✅ Complete (Member 2 Deliverables Verified)
 **Objective:** Implement Alpha-Beta pruning, depth-limited heuristics, MCTS (UCT), and Pygame GUI skeleton.
 **Requirements:** REQ-08, REQ-09, REQ-10
 **Depends on:** Phase 1
 
 **Plans:**
-- [ ] Plan 2.1: Alpha-Beta pruning with iterative deepening and heuristic evaluation (Member 1)
-- [ ] Plan 2.2: Monte Carlo Tree Search with UCT selection and playouts (Member 2)
-- [ ] Plan 2.3: Pygame GUI skeleton with board rendering and click-to-drop input (Member 2)
+- [x] Plan 2.1: Alpha-Beta pruning with iterative deepening and heuristic evaluation (Member 1)
+- [x] Plan 2.2: Monte Carlo Tree Search with UCT selection and playouts (Member 2)
+- [x] Plan 2.3: Pygame GUI skeleton with board rendering and multi-game benchmark runner (Member 2)
 
 ---
 
