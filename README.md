@@ -1,6 +1,6 @@
 # Connect Four AI: Adversarial Search vs. Monte Carlo Tree Search
 
-[![Tests](https://img.shields.io/badge/tests-17%20passed-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/tests-34%20passed-brightgreen.svg)]()
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue.svg)]()
 [![Course](https://img.shields.io/badge/Course-ECSCT24301%20Foundation%20of%20AI-orange.svg)]()
 [![Institution](https://img.shields.io/badge/Institution-Adani%20University-red.svg)]()
@@ -40,6 +40,16 @@ This project designs, implements, and benchmarks autonomous decision-making agen
 
 ---
 
+## ⚡ Week 2 Milestone Status (Member 1 Deliverables)
+
+- [x] **Alpha-Beta Pruning**: Depth-limited adversarial search with alpha-beta cutoff and center-out move ordering ([connect4/agents/alphabeta_agent.py](connect4/agents/alphabeta_agent.py)).
+- [x] **Heuristic Evaluation Function**: 69 sliding 4-window evaluation weighting 2-discs, 3-discs, and center control ([connect4/agents/heuristic.py](connect4/agents/heuristic.py)).
+- [x] **Iterative Deepening with Time Budget**: Time-bounded search with per-node deadline checks and depth tracking ([connect4/agents/iterative_agent.py](connect4/agents/iterative_agent.py)).
+- [x] **Heuristic Unit Tests**: Comprehensive test suite covering heuristic windows, sign symmetries, pruning parity, and time limits (34/34 tests passing).
+- [x] **Algorithm Analysis & Viva Prep**: Theoretical and empirical evaluation documented in [docs/ALGORITHMS.md](docs/ALGORITHMS.md).
+
+---
+
 ## 📁 Repository Structure
 
 ```
@@ -50,17 +60,24 @@ connect-four/
 │   ├── agents/
 │   │   ├── base.py             # Abstract base agent class
 │   │   ├── random_agent.py     # Uniform random baseline
-│   │   └── minimax_agent.py    # Plain Minimax (measures state-space explosion)
+│   │   ├── minimax_agent.py    # Plain Minimax (measures state-space explosion)
+│   │   ├── alphabeta_agent.py  # Minimax with Alpha-Beta pruning & heuristic switch
+│   │   ├── heuristic.py        # 69-window evaluation function for non-terminal states
+│   │   └── iterative_agent.py  # Iterative deepening Alpha-Beta with time budget
 │   ├── benchmark/
 │   │   └── instrumentation.py  # Wall-clock time, tracemalloc, node counter wrapper
 │   └── cli/
 │       └── game_loop.py        # Interactive CLI game loop with telemetry
 ├── docs/
 │   ├── CODING_CONVENTIONS.md   # PEP 8, typing, git commit guidelines
-│   └── PEAS_AND_PROBLEM_STATEMENT.md # Academic PEAS & state-space formulation
+│   ├── PEAS_AND_PROBLEM_STATEMENT.md # Academic PEAS & state-space formulation
+│   └── ALGORITHMS.md           # Algorithm theory, heuristic design & benchmark results
 ├── tests/
 │   ├── test_board.py           # Board rules & win-condition unit tests
 │   ├── test_agents.py          # Random & Minimax behavior verification
+│   ├── test_alphabeta.py       # Alpha-Beta move parity & pruning tests
+│   ├── test_heuristic.py       # Heuristic sliding window evaluation tests
+│   ├── test_iterative.py       # Iterative deepening & time limit tests
 │   ├── test_instrumentation.py # Timer, memory profiler & node counter tests
 │   └── test_game_loop.py       # Full automated game simulation tests
 ├── .gsd/                       # Get Shit Done (GSD) spec, roadmap, and state
@@ -91,6 +108,16 @@ python main.py --mode human-vs-agent --agent2 minimax --depth2 4
 ### 4. Run Agent vs. Agent (Random vs. Plain Minimax)
 ```bash
 python main.py --mode agent-vs-agent --agent1 random --agent2 minimax --depth2 3 --delay 0.3
+```
+
+### 5. Run Alpha-Beta with Heuristic Evaluation
+```bash
+python main.py --mode agent-vs-agent --agent1 alphabeta --agent2 alphabeta --depth1 4 --depth2 4 --heuristic2
+```
+
+### 6. Run Iterative Deepening with Time Budget
+```bash
+python main.py --mode agent-vs-agent --agent1 alphabeta --agent2 iterative --depth1 4 --depth2 10 --time2 1.0
 ```
 
 ---

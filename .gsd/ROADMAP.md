@@ -1,13 +1,13 @@
 ---
 milestone: v1.0
 version: 1.0.0
-updated: 2026-10-10T14:45:00+05:30
+updated: 2026-10-11T19:40:00+05:30
 ---
 
 # Roadmap
 
-> **Current Phase:** Phase 1 - Environment, Baselines & Game Engine (Week 1)
-> **Status:** Executing
+> **Current Phase:** Phase 2 - Advanced Algorithms & Heuristic Design (Week 2)
+> **Status:** Executing (Member 1 Deliverables Complete)
 
 ## Must-Haves (from SPEC)
 
@@ -16,9 +16,9 @@ updated: 2026-10-10T14:45:00+05:30
 - [x] Benchmarking instrumentation wrapper (time, memory, nodes expanded)
 - [x] CLI game loop supporting Human-vs-Agent and Agent-vs-Agent
 - [x] Comprehensive PEAS and Problem Statement documentation
-- [ ] Alpha-Beta pruning with heuristic evaluation (Week 2)
-- [ ] Monte Carlo Tree Search (MCTS / UCT) agent (Week 2)
-- [ ] Interactive Pygame GUI interface (Week 2-3)
+- [x] Alpha-Beta pruning with heuristic evaluation (Week 2 - Member 1)
+- [ ] Monte Carlo Tree Search (MCTS / UCT) agent (Week 2 - Member 2)
+- [ ] Interactive Pygame GUI interface (Week 2-3 - Member 2)
 - [ ] Comprehensive benchmarking harness, visualizations, and final report (Week 3)
 
 ---
@@ -38,13 +38,13 @@ updated: 2026-10-10T14:45:00+05:30
 ---
 
 ### Phase 2: Advanced Algorithms & Heuristic Design (Week 2)
-**Status:** ⬜ Not Started
+**Status:** 🟡 In Progress
 **Objective:** Implement Alpha-Beta pruning, depth-limited heuristics, MCTS (UCT), and Pygame GUI skeleton.
 **Requirements:** REQ-08, REQ-09, REQ-10
 **Depends on:** Phase 1
 
 **Plans:**
-- [ ] Plan 2.1: Alpha-Beta pruning with iterative deepening and heuristic evaluation (Member 1)
+- [x] Plan 2.1: Alpha-Beta pruning with iterative deepening and heuristic evaluation (Member 1)
 - [ ] Plan 2.2: Monte Carlo Tree Search with UCT selection and playouts (Member 2)
 - [ ] Plan 2.3: Pygame GUI skeleton with board rendering and click-to-drop input (Member 2)
 
@@ -68,7 +68,7 @@ updated: 2026-10-10T14:45:00+05:30
 | Phase | Status | Plans | Complete |
 |-------|--------|-------|----------|
 | 1 | ✅ | 3/3 | 100% |
-| 2 | ⬜ | 0/3 | 0% |
+| 2 | 🟡 | 1/3 | 33% |
 | 3 | ⬜ | 0/3 | 0% |
 
 ---
@@ -78,5 +78,5 @@ updated: 2026-10-10T14:45:00+05:30
 | Phase | Started | Completed | Duration |
 |-------|---------|-----------|----------|
 | 1 | 2026-10-10 | 2026-10-10 | 1 day |
-| 2 | — | — | — |
+| 2 | 2026-10-11 | — | In Progress |
 | 3 | — | — | — |
