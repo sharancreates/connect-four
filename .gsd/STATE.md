@@ -6,10 +6,10 @@ updated: 2026-10-12T07:58:00+05:30
 
 ## Current Position
 
-- **Phase**: 2 - Advanced Algorithms & Heuristic Design (Week 2)
-- **Active Roles**: Member 1 (Algorithms & Search) & Member 2 (Engineering, GUI & Evaluation)
-- **Branch**: `person-b-week-2`
-- **Status**: Phase 2 Complete & Fully Integrated
+- **Phase**: 3 - Benchmarking, GUI Integration, Analysis & Report (Week 3)
+- **Active Role**: Member 2 (Engineering, GUI & Evaluation)
+- **Branch**: `person-b-week-3`
+- **Status**: Phase 3 Planned (3 Plans in 2 Waves)
 
 ---
 
@@ -55,7 +55,6 @@ All unit and integration tests across both members' implementations are fully in
 ---
 
 ## Next Steps (Week 3 / Phase 3)
-1. Run full comparative benchmark suite: Alpha-Beta vs. Iterative Deepening vs. MCTS vs. Random across small/medium/large search-depth and thinking-time settings.
-2. Generate comparative plots (execution time vs. depth, nodes/simulations expanded, win rates).
-3. Finalize Pygame GUI integration with move playback and visual highlights.
-4. Write Sections 1-8 of final report draft.
+1. `/execute 3` — Execute Plan 3.1 (Pygame GUI visual polish & controls) and Plan 3.2 (Comparative plotting suite & 4 publication figures).
+2. Execute Plan 3.3 (Stage 3 academic report draft Sections 1, 6, 7 & viva defense guide).
+3. Validate and verify complete suite with `python -m pytest tests/ -v`.

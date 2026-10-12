@@ -51,15 +51,15 @@ updated: 2026-10-12T07:58:00+05:30
 ---
 
 ### Phase 3: Benchmarking, GUI Integration, Analysis & Report (Week 3)
-**Status:** ⬜ Not Started
-**Objective:** Run comparative benchmarks, finish GUI integration, generate plots, and complete final report.
+**Status:** 🟡 Planned
+**Objective:** Finish GUI visual polish with live controls, build publication plotting engine, run comparative benchmarks, and complete Stage 3 academic report and viva guide.
 **Requirements:** REQ-11
 **Depends on:** Phase 2
 
 **Plans:**
-- [ ] Plan 3.1: Full benchmark execution across thinking time budgets & depth settings (Member 1 & 2)
-- [ ] Plan 3.2: Complete GUI demo with move playback and visual highlights (Member 2)
-- [ ] Plan 3.3: Analysis, comparative plots, and final project report (Member 1 & 2)
+- [ ] Plan 3.1: Interactive Pygame GUI Polish & Controls (Member 2)
+- [ ] Plan 3.2: Comparative Visualizations Suite & Figures Generation (Member 2)
+- [ ] Plan 3.3: Stage 3 Academic Report (Sections 1, 6, 7) & Viva Defense Guide (Member 2)
 
 ---
 
