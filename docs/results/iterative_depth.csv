@@ -1,0 +1,9 @@
+position,time_limit_s,depth_reached,nodes,elapsed_s
+empty,0.05,5,903,0.05
+empty,0.2,6,4514,0.2
+empty,0.5,7,12137,0.5
+empty,1.0,8,24999,1.0
+mid-game,0.05,3,460,0.05
+mid-game,0.2,5,3036,0.201
+mid-game,0.5,5,4101,0.5
+mid-game,1.0,6,16558,1.0
