@@ -41,3 +41,81 @@ def test_gui_headless_gameplay_flow():
     app.reset()
     assert not app.game_over
     assert app.board.get_legal_moves() == list(range(7))
+
+
+@pytest.mark.skipif(not PYGAME_AVAILABLE, reason="Pygame is not installed")
+def test_gui_pause_and_speed_controls():
+    """Verify pause toggle and speed adjustment logic."""
+    app = Connect4Pygame(headless=True, speed=5)
+    assert app.speed == 5
+    assert not app.paused
+
+    # Toggle pause
+    app.toggle_pause()
+    assert app.paused is True
+    # While paused, human moves should be rejected
+    assert app.step_human_move(0) is False
+
+    app.toggle_pause()
+    assert app.paused is False
+
+    # Adjust speed
+    app.set_speed(1)
+    assert app.speed == 1
+    assert app.delay_ms == 1200
+
+    app.set_speed(9)
+    assert app.speed == 9
+    assert app.delay_ms == 25
+
+    # Out of range clamps
+    app.set_speed(99)
+    assert app.speed == 9
+    app.set_speed(-5)
+    assert app.speed == 1
+
+
+@pytest.mark.skipif(not PYGAME_AVAILABLE, reason="Pygame is not installed")
+def test_gui_winning_overlay_rendering():
+    """Verify that winning coordinates trigger winning line rendering in draw_board."""
+    agent = RandomAgent("RandomGUI", player=PLAYER_2, seed=1)
+    app = Connect4Pygame(opponent=agent, headless=True)
+
+    # Force a winning sequence for Player 1: columns 0, 1, 2, 3
+    for col in range(3):
+        app.step_human_move(col)          # P1
+        app.board.make_move(col + 4)      # P2
+    app.step_human_move(3)                # P1 wins
+
+    assert app.game_over is True
+    assert app.winner == PLAYER_1
+    assert app.winning_coords == [(5, 0), (5, 1), (5, 2), (5, 3)]
+
+    # draw_board should execute without exception, drawing winning line and last move
+    app.draw_board()
+
+
+@pytest.mark.skipif(not PYGAME_AVAILABLE, reason="Pygame is not installed")
+def test_gui_ai_vs_ai_mode():
+    """Verify AI-vs-AI mode initialization and autonomous step execution."""
+    agent1 = RandomAgent("P1_Random", player=PLAYER_1, seed=10)
+    agent2 = RandomAgent("P2_Random", player=PLAYER_2, seed=20)
+    app = Connect4Pygame(
+        agent1=agent1,
+        agent2=agent2,
+        mode="ai-vs-ai",
+        speed=9,
+        headless=True,
+    )
+
+    assert app.mode == "ai-vs-ai"
+    assert app.board.current_player == PLAYER_1
+
+    # Step AI 1
+    app.step_ai_move(agent1)
+    assert app.board.current_player == PLAYER_2
+    assert app.board.last_move is not None
+
+    # Step AI 2
+    app.step_ai_move(agent2)
+    assert app.board.current_player == PLAYER_1
