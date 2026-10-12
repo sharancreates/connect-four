@@ -1,152 +1,261 @@
-# Connect Four AI: Adversarial Search vs. Monte Carlo Tree Search
+<div align="center">
 
-[![Tests](https://img.shields.io/badge/tests-34%20passed-brightgreen.svg)]()
-[![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue.svg)]()
-[![Course](https://img.shields.io/badge/Course-ECSCT24301%20Foundation%20of%20AI-orange.svg)]()
-[![Institution](https://img.shields.io/badge/Institution-Adani%20University-red.svg)]()
+# 🔴🟡 CONNECT FOUR AI
+### *Adversarial Search meets Monte Carlo Tree Search*
 
-> **Applied AI System Development Track (Track A)** — Game Playing & Adversarial Search  
-> **Course:** ECSCT24301 – Foundation of AI, Academic Year 2026–27  
-> **Faculty of Engineering Sciences and Technology (FEST), Adani University**
+[![Tests](https://img.shields.io/badge/Test%20Suite-44%2F44%20Passing-10B981?style=for-the-badge&logo=pytest&logoColor=white)]()
+[![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11-3776AB?style=for-the-badge&logo=python&logoColor=white)]()
+[![Pygame](https://img.shields.io/badge/GUI-Pygame%20Interactive-E11D48?style=for-the-badge&logo=gamemaker&logoColor=white)]()
+[![Course](https://img.shields.io/badge/Course-ECSCT24301-8B5CF6?style=for-the-badge)]()
+[![Adani University](https://img.shields.io/badge/Adani%20University-FEST%20AI--ML-DC2626?style=for-the-badge)]()
+
+<br>
+
+```text
+       ___                                _     ___                 
+      / __\___  _ __  _ __   ___  ___  __| |_  / __\___  _   _ _ __ 
+     / /  / _ \| '_ \| '_ \ / _ \/ __|/ _` (_) / _\/ _ \| | | | '__|
+    / /__| (_) | | | | | | |  __/ (__| (_| |_ / / | (_) | |_| | |   
+    \____/\___/|_| |_|_| |_|\___|\___|\__,_(_)\_/   \___/ \__,_|_|   
+                     [ 🔴 ⚪ ⚪ ⚪ ⚪ ⚪ 🟡 ]
+```
+
+<p align="center">
+  <b>A research-grade adversarial game engine benchmarking exact heuristic minimax reasoning against statistical Monte Carlo rollouts on a standard 6×7 grid.</b>
+</p>
+
+[🎮 Quickstart](#-quickstart--gameplay-modes) •
+[🧠 Algorithmic Models](#-algorithmic-models) •
+[📊 Benchmark Results](#-empirical-benchmarks) •
+[✨ Pygame GUI](#-graphical-interface) •
+[👥 Team Distribution](#-team-work-distribution)
 
 ---
 
-## 📌 Project Overview
+</div>
 
-This project designs, implements, and benchmarks autonomous decision-making agents for **Connect Four** (standard 6×7 grid). We evaluate the empirical trade-offs between:
-1. **Deterministic Depth-Limited Search**: Minimax with Alpha-Beta pruning, iterative deepening, and heuristic board evaluation.
-2. **Statistical Simulation Search**: Monte Carlo Tree Search (MCTS) utilizing the Upper Confidence Bound applied to Trees (UCT) selection policy.
-3. **Baselines**: Uniform Random agent and Plain Minimax (no pruning) measuring raw state-space explosion.
+## 🌌 The Mission
+
+In a discrete $6 \times 7$ grid with $\approx 4.53 \times 10^{12}$ reachable positions and over $10^{21}$ possible game tree paths, Connect Four provides an ideal proving ground for AI reasoning. Exhaustive brute-force search is computationally intractable in real time, exposing a fundamental question in Artificial Intelligence:
+
+> **When under strict thinking-time and compute constraints, does depth-bounded heuristic pruning (Alpha-Beta) outperform statistical simulation-based approximation (MCTS with UCT)?**
+
+This project investigates, implements, and benchmarks both paradigms head-to-head under identical memory, move-latency, and CPU budgets.
 
 ---
 
 ## 👥 Team Work Distribution (3-Week Sprint)
 
-| Role | Member | Responsibilities |
-| :--- | :--- | :--- |
-| **Member 1** | *Algorithms & Core Logic* | Minimax with Alpha-Beta pruning, depth-limited heuristic functions, iterative deepening, state-space write-up, and error analysis. |
-| **Member 2** | *Engineering, GUI & Evaluation* | Repository architecture, coding conventions, CLI game loop, node/time/memory instrumentation wrapper, MCTS implementation, Pygame GUI demo, comparative benchmark harness, and PEAS / problem statement write-up. |
+> **Course:** ECSCT24301 – Foundation of AI (Track A: Applied AI System Development)  
+> **Team of 2:** Responsibilities partitioned across algorithmic core and systems evaluation.
+
+| Role | Member | Responsibilities | Status |
+| :--- | :--- | :--- | :---: |
+| **Member 1** | *Algorithms & Core Logic* | Alpha-Beta pruning, 69-window heuristic evaluation, iterative deepening with time budgeting, theoretical formulation (`docs/ALGORITHMS.md`). | ✅ **Week 1 & 2 Complete** |
+| **Member 2** | *Engineering, GUI & Evaluation* | Modular repository scaffolding, PEAS formulation, performance instrumentation (`tracemalloc`, `perf_counter`), CLI & Pygame GUI, MCTS with UCT, automated tournament benchmark harness. | ✅ **Week 1 & 2 Complete** |
 
 ---
 
-## 🚀 Week 1 Milestone Status (Member 2 Deliverables)
-
-- [x] **Repository Scaffolding & Conventions**: Structured modular Python package with [Coding Conventions](docs/CODING_CONVENTIONS.md).
-- [x] **Academic Documentation**: Formal [PEAS Characterization & Problem Statement](docs/PEAS_AND_PROBLEM_STATEMENT.md).
-- [x] **Performance Instrumentation**: Wrapper tracking wall-clock time (`time.perf_counter`), memory consumption (`tracemalloc`), and node expansions.
-- [x] **Interactive & Automated CLI**: Full-featured command-line game loop supporting Human-vs-Agent and Agent-vs-Agent play.
-- [x] **Playable Baseline Agents**: Random baseline and Plain Minimax (depth-limited, no pruning) with empirical node-expansion logging.
-- [x] **Automated Test Suite**: 17 unit and integration tests passing.
-
----
-
-## ⚡ Week 2 Milestone Status (Member 1 Deliverables)
-
-- [x] **Alpha-Beta Pruning**: Depth-limited adversarial search with alpha-beta cutoff and center-out move ordering ([connect4/agents/alphabeta_agent.py](connect4/agents/alphabeta_agent.py)).
-- [x] **Heuristic Evaluation Function**: 69 sliding 4-window evaluation weighting 2-discs, 3-discs, and center control ([connect4/agents/heuristic.py](connect4/agents/heuristic.py)).
-- [x] **Iterative Deepening with Time Budget**: Time-bounded search with per-node deadline checks and depth tracking ([connect4/agents/iterative_agent.py](connect4/agents/iterative_agent.py)).
-- [x] **Heuristic Unit Tests**: Comprehensive test suite covering heuristic windows, sign symmetries, pruning parity, and time limits (34/34 tests passing).
-- [x] **Algorithm Analysis & Viva Prep**: Theoretical and empirical evaluation documented in [docs/ALGORITHMS.md](docs/ALGORITHMS.md).
-
----
-
-## 📁 Repository Structure
+## 🧠 Algorithmic Models
 
 ```
-connect-four/
-├── connect4/
-│   ├── core/
-│   │   └── board.py            # 6x7 grid, gravity drop, win/draw detection, undo
-│   ├── agents/
-│   │   ├── base.py             # Abstract base agent class
-│   │   ├── random_agent.py     # Uniform random baseline
-│   │   ├── minimax_agent.py    # Plain Minimax (measures state-space explosion)
-│   │   ├── alphabeta_agent.py  # Minimax with Alpha-Beta pruning & heuristic switch
-│   │   ├── heuristic.py        # 69-window evaluation function for non-terminal states
-│   │   └── iterative_agent.py  # Iterative deepening Alpha-Beta with time budget
-│   ├── benchmark/
-│   │   └── instrumentation.py  # Wall-clock time, tracemalloc, node counter wrapper
-│   └── cli/
-│       └── game_loop.py        # Interactive CLI game loop with telemetry
-├── docs/
-│   ├── CODING_CONVENTIONS.md   # PEP 8, typing, git commit guidelines
-│   ├── PEAS_AND_PROBLEM_STATEMENT.md # Academic PEAS & state-space formulation
-│   └── ALGORITHMS.md           # Algorithm theory, heuristic design & benchmark results
-├── tests/
-│   ├── test_board.py           # Board rules & win-condition unit tests
-│   ├── test_agents.py          # Random & Minimax behavior verification
-│   ├── test_alphabeta.py       # Alpha-Beta move parity & pruning tests
-│   ├── test_heuristic.py       # Heuristic sliding window evaluation tests
-│   ├── test_iterative.py       # Iterative deepening & time limit tests
-│   ├── test_instrumentation.py # Timer, memory profiler & node counter tests
-│   └── test_game_loop.py       # Full automated game simulation tests
-├── .gsd/                       # Get Shit Done (GSD) spec, roadmap, and state
-├── main.py                     # Primary executable entrypoint
-└── requirements.txt            # Project dependencies
+                                  ┌───────────────────────────┐
+                                  │   CONNECT FOUR AGENTS     │
+                                  └─────────────┬─────────────┘
+                                                │
+                 ┌──────────────────────────────┼──────────────────────────────┐
+                 ▼                              ▼                              ▼
+      [ Baseline Agents ]            [ Deterministic Search ]       [ Statistical Rollouts ]
+      • Random Uniform Baseline      • Plain Minimax (No Pruning)   • MCTS (UCT Policy)
+                                     • Alpha-Beta with Center Bias  • Dual-Budget (Sims & Time)
+                                     • 69-Window Heuristic          • Tactical Guards
+                                     • Iterative Deepening
 ```
+
+### 1. Baseline Random Agent
+Uniformly samples from valid, non-full columns. Establishes the lower-bound sanity baseline ($O(1)$ move selection).
+
+### 2. Plain Minimax (No Pruning)
+Exhaustive depth-bounded adversarial search evaluating all branches. Demonstrates the raw combinatorial state-space explosion before pruning optimizations.
+
+### 3. Minimax with Alpha-Beta Pruning
+Implements branch cutoff whenever $\alpha \ge \beta$ with center-out column ordering ($\text{col } 3 \to 2, 4 \to 1, 5 \to 0, 6$). Delivers up to **$9.9\times$ node reduction** over plain minimax.
+
+### 4. 69-Window Heuristic Evaluator
+Calculates utility across all **69 winning lines** on a $6 \times 7$ board:
+- **24 horizontal** 4-tuples
+- **21 vertical** 4-tuples
+- **24 diagonal** 4-tuples (12 positive slope, 12 negative slope)
+
+Weights open-3 threats, open-2 sequences, and center control dynamically.
+
+### 5. Iterative Deepening with Time Budget
+Searches depths $d = 1, 2, 3, \dots$ progressively. Employs per-node deadline checks with graceful rollback to the deepest fully completed iteration, guaranteeing move delivery within wall-clock constraints.
+
+### 6. Monte Carlo Tree Search (MCTS) with UCT
+Employs four-stage exploration:
+1. **Selection**: Traverses tree using Upper Confidence Bound:
+   $$\text{UCT}(i) = \frac{w_i}{n_i} + C_p \sqrt{\frac{2 \ln N}{n_i}} \quad (C_p = \sqrt{2} \approx 1.414)$$
+2. **Expansion**: Adds new state node from legal action space.
+3. **Simulation (Rollout)**: Fast simulation to terminal state.
+4. **Backpropagation**: Rewards propagated to parent lineage.
+*Features dual-mode budgeting (fixed simulation count or sub-second wall-clock limit) and 1-ply tactical guards.*
 
 ---
 
-## 💻 Installation & Quickstart
+## 🎮 Quickstart & Gameplay Modes
 
-### 1. Requirements
-Ensure Python 3.10 or 3.11 is installed, then install requirements:
+### 📦 1. Installation
 ```bash
+# Clone the repository
+git clone https://github.com/sharancreates/connect-four.git
+cd connect-four
+
+# Install dependencies (Python 3.10+)
 pip install -r requirements.txt
 ```
 
-### 2. Run the Test Suite
+### 🧪 2. Run the Verification Suite
 ```bash
 python -m pytest tests/ -v
 ```
+> *Runs all 44 unit and integration tests across board mechanics, heuristics, search parity, MCTS, and GUI logic in < 3 seconds.*
 
-### 3. Play Human vs. AI (Minimax)
-```bash
-python main.py --mode human-vs-agent --agent2 minimax --depth2 4
-```
+---
 
-### 4. Run Agent vs. Agent (Random vs. Plain Minimax)
-```bash
-python main.py --mode agent-vs-agent --agent1 random --agent2 minimax --depth2 3 --delay 0.3
-```
+### 🕹️ 3. Play via Pygame Interactive GUI
 
-### 5. Run Alpha-Beta with Heuristic Evaluation
-```bash
-python main.py --mode agent-vs-agent --agent1 alphabeta --agent2 alphabeta --depth1 4 --depth2 4 --heuristic2
-```
+Launch a visual, hardware-rendered Connect Four board with mouse hover discs and real-time AI move indicators:
 
-### 6. Run Iterative Deepening with Time Budget
 ```bash
-python main.py --mode agent-vs-agent --agent1 alphabeta --agent2 iterative --depth1 4 --depth2 10 --time2 1.0
+# Play Human vs. MCTS Agent
+python gui_main.py --agent mcts --simulations 400
+
+# Play Human vs. Alpha-Beta (with Heuristic)
+python gui_main.py --agent alphabeta --depth 4
+
+# Play Human vs. Iterative Deepening (1 second time budget)
+python gui_main.py --agent iterative --depth 8 --time-limit 1.0
 ```
 
 ---
 
-## 📊 Week 1 Baseline Telemetry (Empirical Output)
+### 💻 4. Interactive Command-Line Interface (CLI)
 
-Sample telemetry captured during a Random vs. Plain Minimax match:
+```bash
+# Human (Red 'X') vs. AI (Yellow 'O') in console
+python main.py --mode human-vs-agent --agent2 mcts --simulations2 500
 
-```
- AGENT TELEMETRY:
- [Player 1 (X)] Agent 1 (Random):
-   * Total Moves:     4
-   * Total Time:      0.10 ms
-   * Avg Time / Move: 0.02 ms
-   * Total Nodes:     4
-   * Avg Nodes / Move: 1.0
-   * Peak Memory:     20.54 KB
- [Player 2 (O)] Agent 2 (Minimax):
-   * Total Moves:     4
-   * Total Time:      111.06 ms
-   * Avg Time / Move: 27.77 ms
-   * Total Nodes:     1,540
-   * Avg Nodes / Move: 385.0
-   * Peak Memory:     23.22 KB
+# Watch AI vs AI clash with turn telemetry
+python main.py --mode agent-vs-agent --agent1 alphabeta --agent2 mcts --depth1 4 --simulations2 300 --delay 0.4
 ```
 
 ---
 
-## 📅 Roadmap & Next Phases
+### 🏆 5. Automated Tournament Benchmark Runner
 
-- **Week 2**: Alpha-Beta pruning, iterative deepening, heuristic evaluation function (Member 1) + Monte Carlo Tree Search (UCT) and Pygame GUI skeleton (Member 2).
-- **Week 3**: Comparative benchmarking suite (execution time vs. depth, nodes expanded vs. simulations), plots, GUI integration, and final report compilation.
+Auto-run an $N$-game tournament between any two agents with alternating starting turns to eliminate first-player bias:
+
+```bash
+python benchmark_cli.py --agent1 alphabeta --agent2 mcts --games 10 --depth1 4 --simulations2 300 --verbose
+```
+
+---
+
+## 📊 Empirical Benchmarks
+
+### Head-to-Head Tournament: Alpha-Beta vs. MCTS (4-Game Series)
+
+```
+=================================================================
+            BENCHMARK MATCH EVALUATION REPORT
+=================================================================
+ Total Games Played: 4 (Alternating starting turns)
+-----------------------------------------------------------------
+Metric                    | Alpha-Beta (d=3)   | MCTS (150 sims) 
+-----------------------------------------------------------------
+Wins (Win Rate)           | 2 (50.0%)          | 2 (50.0%)
+Draws (Draw Rate)         | 0 (0.0%)
+Total Moves Played        | 54                 | 54              
+Avg Decision Time         | 15.34 ms           | 276.85 ms
+Avg Expansions / Move     | 60.4 nodes         | 125.2 rollouts
+Peak Memory Allocated     | 1,464.7 KB         | 1,573.6 KB
+=================================================================
+```
+
+### Search Pruning Efficiency (Minimax vs. Alpha-Beta at Depth 4)
+
+| Metric | Plain Minimax | Alpha-Beta (Center Order) | Optimization Gain |
+| :--- | :---: | :---: | :---: |
+| **Nodes Expanded** | 17,134 | 1,726 | **9.9× fewer nodes** |
+| **Total Thinking Time** | 1,907.86 ms | 245.33 ms | **7.8× faster** |
+| **Avg Time / Move** | 90.85 ms | 11.68 ms | **Sub-12ms response** |
+
+---
+
+## 📁 Repository Anatomy
+
+```
+connect-four/
+├── connect4/                   # Core application package
+│   ├── core/
+│   │   └── board.py            # 6x7 Board, gravity, undo, bitwise & coordinate win-checks
+│   ├── agents/                 # Adversarial & simulation intelligence
+│   │   ├── base.py             # Polymorphic Agent interface & statistics
+│   │   ├── random_agent.py     # Uniform random baseline
+│   │   ├── minimax_agent.py    # Exhaustive depth-limited Minimax (state-space baseline)
+│   │   ├── alphabeta_agent.py  # Minimax with Alpha-Beta pruning & heuristic toggle
+│   │   ├── heuristic.py        # Precomputed 69-window evaluation matrix
+│   │   ├── iterative_agent.py  # Iterative deepening Alpha-Beta with time budget
+│   │   └── mcts_agent.py       # Monte Carlo Tree Search with UCT & dual budgeting
+│   ├── benchmark/              # Telemetry & Tournament Evaluation
+│   │   ├── instrumentation.py  # Sub-ms perf_counter & tracemalloc memory profiler
+│   │   └── runner.py           # Multi-game tournament runner with alternating turns
+│   ├── cli/
+│   │   └── game_loop.py        # Terminal loop with live telemetry & board formatting
+│   └── gui/
+│       └── pygame_app.py       # 700x700px graphical Pygame board with hover & drops
+├── docs/                       # Academic & Engineering documentation
+│   ├── CODING_CONVENTIONS.md   # PEP 8, type hints & collaboration standards
+│   ├── PEAS_AND_PROBLEM_STATEMENT.md # Academic PEAS & formal state-space draft
+│   └── ALGORITHMS.md           # Mathematical formulations, heuristic windows & proofs
+├── tests/                      # Automated Test Suite (44 Tests, 100% Pass)
+│   ├── test_board.py           # Board mechanics, gravity, edge cases (9 tests)
+│   ├── test_agents.py          # Random & Minimax baseline tests (4 tests)
+│   ├── test_alphabeta.py       # Alpha-Beta parity & pruning verification (4 tests)
+│   ├── test_heuristic.py       # 69-window score symmetry & threat checks (9 tests)
+│   ├── test_iterative.py       # Iterative deepening time cutoffs & fallbacks (4 tests)
+│   ├── test_mcts.py            # UCT selection, rollouts, deterministic seeding (6 tests)
+│   ├── test_benchmark_runner.py# Tournament runner & turn alternation (2 tests)
+│   ├── test_gui.py             # Headless GUI event loop & coordinate mapping (2 tests)
+│   ├── test_instrumentation.py # Timer & tracemalloc profiler checks (3 tests)
+│   └── test_game_loop.py       # End-to-end simulated match test (1 test)
+├── main.py                     # Primary CLI executable runner
+├── gui_main.py                 # Pygame graphical application launcher
+├── benchmark_cli.py            # Tournament evaluation runner
+└── requirements.txt            # Python dependencies (NumPy, Pygame, Pytest, Matplotlib)
+```
+
+---
+
+## 🎨 Milestones Completed & Next Steps
+
+```text
+  [ Week 1: Foundation & Baselines ] ──────────► COMPLETE (17/17 tests)
+  • Board Engine • Baselines (Random & Minimax) • CLI Loop • Instrumentation • PEAS Draft
+                                     │
+                                     ▼
+  [ Week 2: Advanced Heuristics & MCTS ] ──────► COMPLETE (44/44 tests)
+  • Alpha-Beta Pruning • 69-Window Heuristic • Iterative Deepening • MCTS (UCT) • Pygame GUI
+                                     │
+                                     ▼
+  [ Week 3: Tournament & Scientific Report ] ──► NEXT UP
+  • Large-scale Tournament Benchmarks • Matplotlib Visualizations • Final Report & Viva
+```
+
+---
+
+<div align="center">
+  <sub>Developed for ECSCT24301 Foundation of AI • Adani University (FEST)</sub><br>
+  <sub>Built with ❤️ using Python, NumPy & Pygame</sub>
+</div>
