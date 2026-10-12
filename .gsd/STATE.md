@@ -1,42 +1,61 @@
 ---
-updated: 2026-10-10T15:05:00+05:30
+updated: 2026-10-11T19:40:00+05:30
 ---
 
 # Project State
 
 ## Current Position
 
-- **Phase**: 1 - Environment, Baselines & Game Engine (Week 1)
-- **Active Role**: Handing off from Member 2 (Engineering & Evaluation) to Member 1 (Algorithms & Core Logic)
-- **Status**: Ready for Member 1 Review & Extensions
+- **Phase**: 2 - Advanced Algorithms & Heuristic Design (Week 2)
+- **Active Role**: Member 1 (Algorithms & Core Logic) Deliverables Complete
+- **Status**: Week 2 Member 1 work marked as DONE (Alpha-Beta pruning, 69-window heuristic evaluation, iterative deepening with time budget, test suite expansion, benchmark verification)
 
-## Last Session Summary (Member 2 Deliverables Completed)
+## Week 2 Member 1 Deliverables Summary
 
-Member 2 completed the Week 1 engineering infrastructure:
-1. Package architecture and coding conventions ([docs/CODING_CONVENTIONS.md](file:///c:/Users/Sharanya%20Nagar/Desktop/Projects/connect-four/docs/CODING_CONVENTIONS.md)).
-2. Formal PEAS characterization and problem statement ([docs/PEAS_AND_PROBLEM_STATEMENT.md](file:///c:/Users/Sharanya%20Nagar/Desktop/Projects/connect-four/docs/PEAS_AND_PROBLEM_STATEMENT.md)).
-3. Performance instrumentation wrapper tracking time, tracemalloc memory, and node expansions ([connect4/benchmark/instrumentation.py](file:///c:/Users/Sharanya%20Nagar/Desktop/Projects/connect-four/connect4/benchmark/instrumentation.py)).
-4. Interactive & automated CLI game loop ([connect4/cli/game_loop.py](file:///c:/Users/Sharanya%20Nagar/Desktop/Projects/connect-four/connect4/cli/game_loop.py) & [main.py](file:///c:/Users/Sharanya%20Nagar/Desktop/Projects/connect-four/main.py)).
-5. Working foundational board representation and baseline agents ([connect4/core/board.py](file:///c:/Users/Sharanya%20Nagar/Desktop/Projects/connect-four/connect4/core/board.py), [connect4/agents/random_agent.py](file:///c:/Users/Sharanya%20Nagar/Desktop/Projects/connect-four/connect4/agents/random_agent.py), [connect4/agents/minimax_agent.py](file:///c:/Users/Sharanya%20Nagar/Desktop/Projects/connect-four/connect4/agents/minimax_agent.py)).
-6. Full test suite passing with 17/17 tests verified (`python -m pytest tests/ -v`).
+1. **Algorithms & Agents**:
+   - `AlphaBetaAgent` (`connect4/agents/alphabeta_agent.py`): Depth-limited adversarial search with alpha-beta pruning, center-out move ordering, and optional advanced heuristic toggle.
+   - `Heuristic Evaluation` (`connect4/agents/heuristic.py`): Precomputed 69 four-in-a-row sliding window evaluation (24 horizontal, 21 vertical, 24 diagonal) weighting open 3s (+5/-6), open 2s (+2/-2), center column control (+3), and terminal states.
+   - `IterativeAlphaBetaAgent` (`connect4/agents/iterative_agent.py`): Time-bounded search with per-node deadline checks (`TimeUp` exception), graceful timeout fallback to deepest completed iteration, and depth tracking.
 
-## Handoff to Member 1 (Week 1 Algorithm Responsibilities)
+2. **CLI Integration & Registration**:
+   - `main.py` and `connect4/agents/__init__.py`: Registered `iterative` (`IterativeAlphaBetaAgent`), `--time1`/`--time2` per-move time budgets, and `--heuristic1`/`--heuristic2` flags.
 
-Per the Work Distribution Plan, Member 1 owns:
-- **Board Representation (`connect4/core/board.py`)**: Review/refine state representation, move generation, win/draw checking, and evaluate potential bitboard optimizations.
-- **Random Baseline Agent (`connect4/agents/random_agent.py`)**: Verify baseline random move distribution.
-- **Plain Minimax Agent (`connect4/agents/minimax_agent.py`)**: Inspect depth-limited minimax without pruning, verify raw node-expansion logging across search depths (e.g. depth 2, 3, 4), and ensure pure state-space explosion is properly isolated before Week 2 Alpha-Beta pruning.
-- **State-Space Formulation Write-Up**: Review Section 3 in [docs/PEAS_AND_PROBLEM_STATEMENT.md](file:///c:/Users/Sharanya%20Nagar/Desktop/Projects/connect-four/docs/PEAS_AND_PROBLEM_STATEMENT.md) or author a dedicated state-space formulation doc for the Stage 1 submission.
+3. **Files Touched**:
+   - `connect4/agents/alphabeta_agent.py`
+   - `connect4/agents/heuristic.py`
+   - `connect4/agents/iterative_agent.py`
+   - `connect4/agents/__init__.py`
+   - `main.py`
+   - `tests/test_alphabeta.py`
+   - `tests/test_heuristic.py`
+   - `tests/test_iterative.py`
+   - `docs/ALGORITHMS.md`
+   - `README.md`
+   - `.gsd/STATE.md`
+   - `.gsd/ROADMAP.md`
 
-## Files of Interest for Member 1
-- `connect4/core/board.py`: Board class, gravity drop, win detection.
-- `connect4/agents/minimax_agent.py`: Plain Minimax implementation.
-- `connect4/benchmark/instrumentation.py`: MetricsTracker and telemetry.
-- `docs/PEAS_AND_PROBLEM_STATEMENT.md`: Problem statement and state-space formulation.
-- `tests/test_board.py` & `tests/test_agents.py`: Existing test suite.
+4. **Test Suite Status**:
+   - Total Tests: **34/34 passing** (`python -m pytest tests/ -v` in 1.89s).
+   - Coverage: Board mechanics (10), baseline agents (4), alpha-beta parity & pruning (4), heuristic evaluation windows (9), iterative deepening & time bounds (4), instrumentation (3).
 
-## Next Steps for Member 1
-1. Run `python -m pytest tests/ -v` to confirm environment health.
-2. Experiment with Minimax search depth scaling:
-   `python main.py --mode agent-vs-agent --agent1 random --agent2 minimax --depth2 3`
-3. Finalize any custom enhancements to the state-space write-up or plain Minimax logic.
+5. **Empirical Benchmark Summary**:
+   - **Match (a) Heuristic Evaluation Impact**:
+     `alphabeta` (depth 4, center-only) vs `alphabeta` (depth 4, heuristic enabled)
+     *Winner*: **Player 2 (AlphaBeta with heuristic)** in 34 turns.
+     *P1 (Center)*: 17 moves, 167.06 ms (9.83 ms/move), 1,766 nodes.
+     *P2 (Heuristic)*: 17 moves, 402.53 ms (23.68 ms/move), 2,441 nodes.
+   - **Match (b) Iterative Deepening vs. Fixed Depth**:
+     `alphabeta` (depth 4) vs `iterative` (max depth 10, 1.0s budget)
+     *Winner*: **Player 2 (Iterative)** in 20 turns.
+     *P1 (AlphaBeta)*: 10 moves, 108.58 ms, 1,499 nodes.
+     *P2 (Iterative)*: 10 moves, 7,119.36 ms (711.94 ms/move), 60,920 nodes.
+   - **Match (c) Iterative Deepening vs. Random Baseline**:
+     `random` vs `iterative` (max depth 10, 0.5s budget)
+     *Winner*: **Player 2 (Iterative)** in 8 turns.
+     *P1 (Random)*: 4 moves, 0.13 ms, 4 nodes.
+     *P2 (Iterative)*: 4 moves, 1,019.73 ms, 8,789 nodes.
+
+## Next Steps
+
+- Hand off to Member 2 for MCTS (UCT) agent implementation (`connect4/agents/mcts_agent.py`) and Pygame GUI skeleton.
+- Week 3: Benchmarking support, large-scale tournament evaluation, comparative plotting, and error analysis.
