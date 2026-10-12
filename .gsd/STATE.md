@@ -1,60 +1,54 @@
 ---
-updated: 2026-10-12T07:58:00+05:30
+updated: 2026-10-12T08:34:00+05:30
 ---
 
 # Project State
 
 ## Current Position
-
 - **Phase**: 3 - Benchmarking, GUI Integration, Analysis & Report (Week 3)
 - **Active Role**: Member 2 (Engineering, GUI & Evaluation)
 - **Branch**: `person-b-week-3`
-- **Status**: Phase 3 Planned (3 Plans in 2 Waves)
+- **Task**: Phase 3 Planning Complete — Ready for Execution
+- **Status**: Paused at 2026-10-12 08:34
 
 ---
 
-## Phase 2 Deliverables Summary
-
-### Member 1 Deliverables (Algorithms & Core Logic)
-1. **Alpha-Beta Pruning Agent** (`connect4/agents/alphabeta_agent.py`):
-   - Depth-limited adversarial search with alpha-beta pruning, center-out move ordering, and heuristic toggle.
-2. **69-Window Heuristic Evaluation** (`connect4/agents/heuristic.py`):
-   - Precomputed 69 four-in-a-row sliding window evaluation (24 horizontal, 21 vertical, 24 diagonal) weighting open 3s (+5/-6), open 2s (+2/-2), and center column control (+3).
-3. **Iterative Deepening Agent** (`connect4/agents/iterative_agent.py`):
-   - Time-bounded search with per-node deadline checks (`TimeUp`), graceful timeout fallback to deepest completed iteration, and depth reporting.
-4. **Documentation**:
-   - `docs/ALGORITHMS.md`: Comprehensive theoretical and mathematical formulation of Alpha-Beta, window evaluation heuristics, and iterative deepening.
-
-### Member 2 Deliverables (Engineering, GUI & Evaluation)
-1. **Monte Carlo Tree Search (MCTS) Agent** (`connect4/agents/mcts_agent.py`):
-   - UCT tree policy ($C_p = 1.414$) with 4-phase iteration (Selection, Expansion, Rollout, Backpropagation).
-   - Dual-mode search budgeting: supports fixed rollout counts (e.g. 500 simulations) and wall-clock deadlines (e.g. 200 ms).
-   - Tactical guards for 1-ply winning moves and immediate threat blocking.
-2. **Multi-Game Benchmark Harness** (`connect4/benchmark/runner.py` & `benchmark_cli.py`):
-   - `BenchmarkRunner`: Auto-runs $N$ matches with alternating starting players to neutralize first-mover bias.
-   - Generates executive comparison tables reporting win rates, decision latency, node/sim expansions, and peak memory.
-3. **Interactive Pygame GUI Skeleton** (`connect4/gui/pygame_app.py` & `gui_main.py`):
-   - 700×700px graphical board rendering, mouse hover disc tracking, click-to-drop input, and thinking status display.
-   - Headless execution mode for testing.
+## Last Session Summary
+- Conducted `/discuss-phase 3` for Person B covering GUI polish (winning line, last-move indicator, pause/speed controls), automated Matplotlib publication figures, and Stage 3 academic report sections.
+- Created and checked out dedicated branch `person-b-week-3` from `main`.
+- Authored `.gsd/phases/3/RESEARCH.md` and decomposed deliverables into 3 atomic plans:
+  - **Plan 3.1 (Wave 1)**: Interactive Pygame GUI Polish & Controls (`connect4/gui/pygame_app.py`, `gui_main.py`, winning coordinate detection in `board.py`).
+  - **Plan 3.2 (Wave 1)**: Comparative Visualizations Suite & Figures Generation (`connect4/benchmark/plotter.py`, `plotter_cli.py`, 4 high-DPI figures in `docs/figures/`).
+  - **Plan 3.3 (Wave 2)**: Stage 3 Academic Report Draft (Sections 1, 6, 7 & APA references) and Viva Defense Guide (`docs/VIVA_TALKING_POINTS_PERSON_B.md`).
+- Committed all planning artifacts with conventional commits on `person-b-week-3`.
 
 ---
 
-## Unified Test Suite Status
-All unit and integration tests across both members' implementations are fully integrated and passing:
-- `tests/test_board.py` (9 tests)
-- `tests/test_agents.py` (4 tests)
-- `tests/test_alphabeta.py` (4 tests)
-- `tests/test_heuristic.py` (9 tests)
-- `tests/test_iterative.py` (4 tests)
-- `tests/test_mcts.py` (6 tests)
-- `tests/test_benchmark_runner.py` (2 tests)
-- `tests/test_gui.py` (2 tests)
-- `tests/test_game_loop.py` (1 test)
-- `tests/test_instrumentation.py` (3 tests)
+## In-Progress Work
+- No uncommitted code modifications.
+- Test status: 44/44 passing (`python -m pytest tests/ -v`).
+- Working tree: Clean.
 
 ---
 
-## Next Steps (Week 3 / Phase 3)
-1. `/execute 3` — Execute Plan 3.1 (Pygame GUI visual polish & controls) and Plan 3.2 (Comparative plotting suite & 4 publication figures).
-2. Execute Plan 3.3 (Stage 3 academic report draft Sections 1, 6, 7 & viva defense guide).
-3. Validate and verify complete suite with `python -m pytest tests/ -v`.
+## Context Dump
+
+### Decisions Made
+- `[DECISION-005]`: Pygame GUI visual upgrades: winning ray overlay (`Board.get_winning_coordinates()`), last-move accented ring, Spacebar pause/resume, and numeric delay controls (1–9).
+- `[DECISION-006]`: Automated Matplotlib publication plotting suite with headless `Agg` backend generating 4 high-res figures in `docs/figures/`, plus Stage 3 report Sections 1, 6, 7 and Viva defense talking points.
+
+### Key Files of Interest
+- `.gsd/phases/3/3.1-PLAN.md`: Tasks for GUI polish, winning ray math, and playback controls.
+- `.gsd/phases/3/3.2-PLAN.md`: Tasks for `plotter.py` and publication charts.
+- `.gsd/phases/3/3.3-PLAN.md`: Tasks for academic report Sections 1, 6, 7 and viva presentation script.
+- `connect4/core/board.py`: Destination for `get_winning_coordinates()`.
+- `connect4/gui/pygame_app.py`: GUI event loop and rendering engine.
+- `connect4/benchmark/runner.py`: Empirical data collection source.
+
+---
+
+## Next Steps
+1. Resume with `/execute 3` or `/resume`.
+2. Execute Plan 3.1 (GUI polish) and Plan 3.2 (Matplotlib plotting suite).
+3. Execute Plan 3.3 (Academic report draft & Viva guide).
+4. Run full pytest regression test suite.
