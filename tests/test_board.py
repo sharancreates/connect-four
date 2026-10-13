@@ -148,3 +148,43 @@ def test_draw_condition():
     assert draw_board.is_full()
     assert draw_board.is_terminal()
     assert draw_board.get_winner() is None
+
+
+def test_get_winning_coordinates():
+    """Verify get_winning_coordinates correctly locates horizontal, vertical, and diagonal lines."""
+    empty_board = Board()
+    assert empty_board.get_winning_coordinates() is None
+
+    # 1. Horizontal win in row 5
+    h_board = Board()
+    for col in range(3):
+        h_board.make_move(col)      # P1
+        h_board.make_move(col + 4)  # P2
+    h_board.make_move(3)            # P1 wins: row 5, cols 0..3
+    assert h_board.get_winning_coordinates() == [(5, 0), (5, 1), (5, 2), (5, 3)]
+
+    # 2. Vertical win in col 2
+    v_board = Board()
+    for _ in range(3):
+        v_board.make_move(2)  # P1
+        v_board.make_move(4)  # P2
+    v_board.make_move(2)      # P1 wins: rows 5, 4, 3, 2 in col 2
+    assert v_board.get_winning_coordinates() == [(2, 2), (3, 2), (4, 2), (5, 2)]
+
+    # 3. Positive diagonal win
+    pos_grid = np.zeros((ROWS, COLS), dtype=np.int8)
+    pos_grid[5, 0] = PLAYER_1
+    pos_grid[4, 1] = PLAYER_1
+    pos_grid[3, 2] = PLAYER_1
+    pos_grid[2, 3] = PLAYER_1
+    pos_board = Board(pos_grid)
+    assert pos_board.get_winning_coordinates() == [(5, 0), (4, 1), (3, 2), (2, 3)]
+
+    # 4. Negative diagonal win
+    neg_grid = np.zeros((ROWS, COLS), dtype=np.int8)
+    neg_grid[2, 0] = PLAYER_2
+    neg_grid[3, 1] = PLAYER_2
+    neg_grid[4, 2] = PLAYER_2
+    neg_grid[5, 3] = PLAYER_2
+    neg_board = Board(neg_grid)
+    assert neg_board.get_winning_coordinates() == [(2, 0), (3, 1), (4, 2), (5, 3)]

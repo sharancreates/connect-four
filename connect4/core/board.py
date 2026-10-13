@@ -203,6 +203,40 @@ class Board:
 
         return False
 
+    def get_winning_coordinates(self) -> Optional[List[Tuple[int, int]]]:
+        """Find and return the coordinates of the 4 consecutive winning discs.
+
+        Returns:
+            List of four (row, col) tuples in spatial order if a winning line exists,
+            or None if no player has achieved a 4-in-a-row.
+        """
+        for player in (PLAYER_1, PLAYER_2):
+            # 1. Horizontal
+            for r in range(ROWS):
+                for c in range(COLS - 3):
+                    if (self.grid[r, c:c + 4] == player).all():
+                        return [(r, c + i) for i in range(4)]
+
+            # 2. Vertical
+            for c in range(COLS):
+                for r in range(ROWS - 3):
+                    if (self.grid[r:r + 4, c] == player).all():
+                        return [(r + i, c) for i in range(4)]
+
+            # 3. Positive Diagonal (bottom-left to top-right)
+            for r in range(3, ROWS):
+                for c in range(COLS - 3):
+                    if all(self.grid[r - i, c + i] == player for i in range(4)):
+                        return [(r - i, c + i) for i in range(4)]
+
+            # 4. Negative Diagonal (top-left to bottom-right)
+            for r in range(ROWS - 3):
+                for c in range(COLS - 3):
+                    if all(self.grid[r + i, c + i] == player for i in range(4)):
+                        return [(r + i, c + i) for i in range(4)]
+
+        return None
+
     def is_full(self) -> bool:
         """Check if all positions on the board are occupied."""
         return not (self.grid[0] == EMPTY).any()

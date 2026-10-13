@@ -1,61 +1,55 @@
 ---
-updated: 2026-10-12T07:58:00+05:30
+updated: 2026-10-12T22:12:00+05:30
 ---
 
 # Project State
 
 ## Current Position
-
-- **Phase**: 2 - Advanced Algorithms & Heuristic Design (Week 2)
-- **Active Roles**: Member 1 (Algorithms & Search) & Member 2 (Engineering, GUI & Evaluation)
-- **Branch**: `person-b-week-2`
-- **Status**: Phase 2 Complete & Fully Integrated
-
----
-
-## Phase 2 Deliverables Summary
-
-### Member 1 Deliverables (Algorithms & Core Logic)
-1. **Alpha-Beta Pruning Agent** (`connect4/agents/alphabeta_agent.py`):
-   - Depth-limited adversarial search with alpha-beta pruning, center-out move ordering, and heuristic toggle.
-2. **69-Window Heuristic Evaluation** (`connect4/agents/heuristic.py`):
-   - Precomputed 69 four-in-a-row sliding window evaluation (24 horizontal, 21 vertical, 24 diagonal) weighting open 3s (+5/-6), open 2s (+2/-2), and center column control (+3).
-3. **Iterative Deepening Agent** (`connect4/agents/iterative_agent.py`):
-   - Time-bounded search with per-node deadline checks (`TimeUp`), graceful timeout fallback to deepest completed iteration, and depth reporting.
-4. **Documentation**:
-   - `docs/ALGORITHMS.md`: Comprehensive theoretical and mathematical formulation of Alpha-Beta, window evaluation heuristics, and iterative deepening.
-
-### Member 2 Deliverables (Engineering, GUI & Evaluation)
-1. **Monte Carlo Tree Search (MCTS) Agent** (`connect4/agents/mcts_agent.py`):
-   - UCT tree policy ($C_p = 1.414$) with 4-phase iteration (Selection, Expansion, Rollout, Backpropagation).
-   - Dual-mode search budgeting: supports fixed rollout counts (e.g. 500 simulations) and wall-clock deadlines (e.g. 200 ms).
-   - Tactical guards for 1-ply winning moves and immediate threat blocking.
-2. **Multi-Game Benchmark Harness** (`connect4/benchmark/runner.py` & `benchmark_cli.py`):
-   - `BenchmarkRunner`: Auto-runs $N$ matches with alternating starting players to neutralize first-mover bias.
-   - Generates executive comparison tables reporting win rates, decision latency, node/sim expansions, and peak memory.
-3. **Interactive Pygame GUI Skeleton** (`connect4/gui/pygame_app.py` & `gui_main.py`):
-   - 700×700px graphical board rendering, mouse hover disc tracking, click-to-drop input, and thinking status display.
-   - Headless execution mode for testing.
+- **Phase**: 3 - Benchmarking, GUI Integration, Analysis & Report (Week 3)
+- **Active Role**: Member 2 (Engineering, GUI & Evaluation)
+- **Branch**: `person-b-week-3`
+- **Status**: ✅ Phase 3 Complete & Verified (3/3 Plans Executed)
 
 ---
 
-## Unified Test Suite Status
-All unit and integration tests across both members' implementations are fully integrated and passing:
-- `tests/test_board.py` (9 tests)
-- `tests/test_agents.py` (4 tests)
-- `tests/test_alphabeta.py` (4 tests)
-- `tests/test_heuristic.py` (9 tests)
-- `tests/test_iterative.py` (4 tests)
-- `tests/test_mcts.py` (6 tests)
-- `tests/test_benchmark_runner.py` (2 tests)
-- `tests/test_gui.py` (2 tests)
-- `tests/test_game_loop.py` (1 test)
-- `tests/test_instrumentation.py` (3 tests)
+## Deliverables Summary (Phase 3 — Member 2)
+
+### 1. Pygame GUI Visual Polish & Live Controls (Plan 3.1)
+- `connect4/core/board.py`: Added `get_winning_coordinates()` supporting horizontal, vertical, and diagonal win vector detection.
+- `connect4/gui/pygame_app.py`:
+  - **Winning Ray Overlay**: Dynamic neon emerald victory line connecting the 4 winning discs with accent circles.
+  - **Last-Move Ring**: Prominent white circular outline and center dot on the latest placed disc (`board.last_move`).
+  - **Playback Controls**: Instant Spacebar pause/resume toggle, dynamic speed scaling (keys 1–9, delay pacing 1,200ms to 25ms), and top-banner HUD.
+- `gui_main.py`: Interactive CLI supporting `--mode {human-vs-ai,ai-vs-ai}`, `--agent1`, `--agent2`, `--speed`, and `--headless`.
+
+### 2. Publication Visualizations Suite (Plan 3.2)
+- `connect4/benchmark/plotter.py` & `plotter_cli.py`:
+  - Headless `Agg` backend with modern publication aesthetics.
+  - Generated 4 high-DPI (300 DPI) figures saved in `docs/figures/`:
+    - **Figure 1**: Mean Move Latency vs. Search Depth (`fig1_execution_time_vs_depth.png`).
+    - **Figure 2**: Search Space Expansion vs. Depth on Logarithmic Scale (`fig2_nodes_expanded_log_scale.png`), showcasing 98.4% branch pruning at depth 6.
+    - **Figure 3**: Head-to-Head Tournament Win-Rate Matrix Heatmap (`fig3_tournament_winrate_heatmap.png`).
+    - **Figure 4**: Peak Heap Memory Consumption per Algorithm (`fig4_peak_memory_footprint.png`).
+
+### 3. Stage 3 Academic Report & Viva Defense Guide (Plan 3.3)
+- `docs/STAGE3_REPORT_SECTIONS_1_6_7.md`:
+  - **Section 1**: Connect Four state-space complexity ($4.53 \times 10^{12}$ reachable positions), game tree complexity ($10^{21}$), and PEAS environmental formalization.
+  - **Section 6**: Controlled tournament experimental setup ($N=20$, alternating first-mover), 10-row quantitative benchmark metrics table, detailed analysis of all 4 figures, and algorithmic trade-off evaluation.
+  - **Section 7**: Modular software architecture, microsecond latency & `tracemalloc` memory profiling rigor, and 60 FPS Pygame GUI design.
+  - **Academic References**: Formal APA-7 bibliography.
+- `docs/VIVA_TALKING_POINTS_PERSON_B.md`:
+  - 3-Minute Elevator Presentation pitch.
+  - Step-by-step live demo script with exact terminal commands for GUI and benchmark demonstration.
+  - 6 technical viva defense questions and model answers for examiners.
 
 ---
 
-## Next Steps (Week 3 / Phase 3)
-1. Run full comparative benchmark suite: Alpha-Beta vs. Iterative Deepening vs. MCTS vs. Random across small/medium/large search-depth and thinking-time settings.
-2. Generate comparative plots (execution time vs. depth, nodes/simulations expanded, win rates).
-3. Finalize Pygame GUI integration with move playback and visual highlights.
-4. Write Sections 1-8 of final report draft.
+## Test Suite Status
+- **53/53 tests passing** across entire codebase (`python -m pytest tests/ -v` in 20.85s).
+
+---
+
+## Next Steps
+1. Review generated figures in `docs/figures/` and academic report in `docs/STAGE3_REPORT_SECTIONS_1_6_7.md`.
+2. Push `person-b-week-3` to remote repository (`origin/person-b-week-3`).
+3. Rehearse live demonstration using `docs/VIVA_TALKING_POINTS_PERSON_B.md`.

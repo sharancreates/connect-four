@@ -7,6 +7,13 @@ from connect4.benchmark.instrumentation import (
     format_metrics,
 )
 from connect4.benchmark.runner import BenchmarkRunner, MatchStats
+from connect4.benchmark.plotter import (
+    plot_execution_time_vs_depth,
+    plot_nodes_expanded_log_scale,
+    plot_winrate_matrix_heatmap,
+    plot_memory_footprint,
+    generate_all_figures,
+)
 
 __all__ = [
     "MoveMetrics",
@@ -15,4 +22,9 @@ __all__ = [
     "format_metrics",
     "BenchmarkRunner",
     "MatchStats",
+    "plot_execution_time_vs_depth",
+    "plot_nodes_expanded_log_scale",
+    "plot_winrate_matrix_heatmap",
+    "plot_memory_footprint",
+    "generate_all_figures",
 ]

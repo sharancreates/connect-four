@@ -78,3 +78,41 @@ Week 2 requires extending the benchmarking harness to auto-run many seeded agent
 1. Create `connect4.benchmark.runner` (`BenchmarkRunner`) to orchestrate multi-game matches with alternating first-mover turns, random seeds, and tabular metric summaries.
 2. Build `connect4.gui.app` (`Connect4Pygame`) with visual 6x7 grid rendering, hover disc tracking, click-to-drop input, and turn management.
 
+---
+
+## [DECISION-005] Advanced Pygame GUI Visual Polish & Playback Controls
+
+**Date**: 2026-10-12
+**Status**: Accepted
+
+### Context
+Week 3 requires finalizing the GUI integration for both human-vs-agent and agent-vs-agent demonstration modes with move playback and visual highlights.
+
+### Decision
+Enhance `Connect4Pygame` in `connect4/gui/pygame_app.py`:
+1. **Winning Ray Overlay**: Detect the exact coordinates of the four winning discs and draw a dynamic glowing victory line connecting their centers.
+2. **Last-Move Ring Highlight**: Render an accented circular highlight around the most recently placed disc so players can immediately track the opponent's move.
+3. **Playback Speed & Pause Controls**: In agent-vs-agent and agent-vs-human modes, allow spacebar pausing/resuming and adjustable delay steps (1-9 numeric keys or keys `+`/`-`).
+
+### Rationale
+Provides a presentation-ready live demonstration interface for faculty and viva examiners.
+
+---
+
+## [DECISION-006] Automated Matplotlib Visualizations & Academic Report Structure
+
+**Date**: 2026-10-12
+**Status**: Accepted
+
+### Context
+Member 2 is responsible for generating comparative plots and drafting report sections 1, 6, 7 and compiling APA references.
+
+### Decision
+1. Build `connect4/benchmark/plotter.py` generating 4 publication-quality charts saved to `docs/figures/`:
+   - Execution Time (Latency) vs. Search Depth / Simulation Budget.
+   - Nodes / Simulations Expanded vs. Depth (logarithmic scale demonstrating pruning efficiency).
+   - Head-to-Head Tournament Win-Rate Matrix Heatmap.
+   - Memory Consumption Footprint comparison.
+2. Author `docs/STAGE3_REPORT_SECTIONS_1_6_7.md` adhering to the Adani University Stage 1 & Stage 3 specifications.
+3. Author `docs/VIVA_TALKING_POINTS_PERSON_B.md` providing a rehearsed live demonstration script and technical defense points.
+
