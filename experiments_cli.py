@@ -45,8 +45,8 @@ def save_csv(out_dir, name, header, rows):
 def run_depth(results_dir, time_cap):
     kinds = [
         ("minimax", 5, lambda p, d: MinimaxAgent(player=p, depth=d)),
-        ("alphabeta", 7, lambda p, d: AlphaBetaAgent(player=p, depth=d)),
-        ("alphabeta+heuristic", 7, lambda p, d: AlphaBetaAgent(player=p, depth=d, use_heuristic=True)),
+        ("alphabeta", 9, lambda p, d: AlphaBetaAgent(player=p, depth=d)),
+        ("alphabeta+heuristic", 9, lambda p, d: AlphaBetaAgent(player=p, depth=d, use_heuristic=True)),
     ]
     rows = []
 
