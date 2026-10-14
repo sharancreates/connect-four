@@ -78,20 +78,25 @@ To ensure rigorous, statistically sound, and unbiased evaluation, all empirical 
 | **MCTS (UCT)** | $N = 500 \text{ rollouts}$ | $112.50 \pm 8.90$ | $312.8 \text{ KiB}$ | $500 \text{ rollouts}$ | N/A (Tree Policy) | $95.0\%$ |
 | **MCTS (UCT)** | $N = 1000 \text{ rollouts}$ | $226.00 \pm 16.40$ | $624.5 \text{ KiB}$ | $1,000 \text{ rollouts}$ | N/A (Tree Policy) | $100.0\%$ |
 
+> **Measurement Methodology & Counting Notes:**  
+> 1. **Tournament Mean vs. Single Position**: The figures reported above reflect mean move-by-move deliberation metrics averaged across full 40-ply tournament matches. While opening-move Alpha-Beta ($d=6$) on an empty board expands $\approx 1,248$ nodes and dense mid-game positions reach $\approx 4,747$ nodes (as detailed in Section 4 & 5), the mean deliberation across full gameplay stabilizes at $1,890 \pm 210$ nodes.  
+> 2. **Node Counting Convention**: The Minimax entry reports the theoretical leaf evaluation count $7^d$ ($343$ leaves at $d=3$), whereas total tree node traversals including internal branch states equal $\sum_{i=1}^d 7^i = 399$ nodes ($400$ including the root state).  
+> 3. **Move Ordering Comparison**: The "Alpha-Beta (Default)" baseline evaluates legal columns in left-to-right order ($0 \dots 6$), whereas our primary `AlphaBetaAgent` employs center-out priority (`[3, 2, 4, 1, 5, 0, 6]`), isolating the direct contribution of domain move ordering to pruning efficiency.
+
 ---
 
 ### 6.3 In-Depth Analysis of Publication Figures
 
 #### Figure 1: Execution Time (Latency) vs. Search Depth
-![Figure 1: Mean Move Latency vs Search Depth](file:///c:/Users/Sharanya%20Nagar/Desktop/Projects/connect-four/docs/figures/fig1_execution_time_vs_depth.png)
+![Figure 1: Mean Move Latency vs Search Depth](figures/fig1_execution_time_vs_depth.png)
 
 As demonstrated in **Figure 1**, Vanilla Minimax exhibits catastrophic exponential scaling as search depth increases:
 - At depth $d = 4$, Minimax requires $78.9\text{ ms}$, escalating sharply to $3,750\text{ ms}$ at depth $d = 6$.
 - In contrast, Alpha-Beta pruning with center-out move ordering (`[3, 2, 4, 1, 5, 0, 6]`) completes depth 6 in just $88.5\text{ ms}$—achieving a **$42.4\times$ speedup** over unpruned Minimax.
-- Center-out ordering accelerates cutoff frequency because central column discs participate in 21 distinct 4-in-a-row scoring windows (horizontal, vertical, diagonal), yielding strong heuristic bounds early in the search tree.
+- Center-out ordering accelerates cutoff frequency because central column discs participate in 51 distinct 4-in-a-row scoring windows (all 24 horizontal, all 24 diagonal, and 3 vertical windows across column 3), yielding strong heuristic bounds early in the search tree.
 
 #### Figure 2: Search Space Expansion (Logarithmic Scale)
-![Figure 2: Search Space Expansion vs Depth](file:///c:/Users/Sharanya%20Nagar/Desktop/Projects/connect-four/docs/figures/fig2_nodes_expanded_log_scale.png)
+![Figure 2: Search Space Expansion vs Depth](figures/fig2_nodes_expanded_log_scale.png)
 
 **Figure 2** highlights the theoretical and empirical power of adversarial pruning plotted on a $\log_{10}$ semi-log scale:
 - At depth $d = 6$, Vanilla Minimax is forced to expand all $7^6 = 117,649$ nodes.
@@ -100,15 +105,15 @@ As demonstrated in **Figure 1**, Vanilla Minimax exhibits catastrophic exponenti
 - This validates Knuth & Moore's asymptotic theorem: under near-optimal move ordering, Alpha-Beta's effective branching factor approaches $b^* \approx \sqrt{b} = \sqrt{7} \approx 2.65$, allowing search to reach double the depth of standard Minimax within the same time budget.
 
 #### Figure 3: Head-to-Head Tournament Win-Rate Heatmap
-![Figure 3: Head-to-Head Tournament Win-Rate Matrix](file:///c:/Users/Sharanya%20Nagar/Desktop/Projects/connect-four/docs/figures/fig3_tournament_winrate_heatmap.png)
+![Figure 3: Head-to-Head Tournament Win-Rate Matrix](figures/fig3_tournament_winrate_heatmap.png)
 
 **Figure 3** illustrates the comprehensive $5 \times 5$ tournament win-rate matrix across $N = 20$ matches per pairing:
 - **Alpha-Beta Dominance**: Alpha-Beta ($d=6$) emerges as the tournament champion, achieving a $70.0\%$ win rate against MCTS ($N=500$) and $100\%$ against baseline agents.
-- **MCTS Performance**: MCTS ($N=500$) dominates shallow Minimax ($d=3$, $70\%$ win rate) and Random ($95\%$), but experiences tactical vulnerabilities against deep Alpha-Beta ($d=6$). Because random MCTS rollouts lack long-range tactical lookahead, MCTS occasionally fails to detect multi-turn trap setups (e.g. double-threat horizontal alignments) unless tactical guards are explicitly enforced.
+- **MCTS Tactical Horizon**: MCTS with tactical guards achieves 100% reliability on immediate 1-ply winning moves and 1-ply threat blocking (blocking 20/20 in empirical block tests, Section 8.2a). However, against deep Alpha-Beta ($d=6$), MCTS can remain vulnerable to multi-ply combinations—specifically forks or double-threat alignments set up 2 to 3 plies in advance, where two winning threats are created simultaneously. Because unguided random rollouts cannot reliably identify deep multi-turn trap setups, Alpha-Beta's exhaustive tactical lookahead maintains an edge.
 - **First-Player Edge**: Across all agent matchups, Player 1 (first mover) maintained an average $56.8\%$ win-rate advantage, verifying the theoretical bias established by Allen and Allis.
 
 #### Figure 4: Peak Memory Consumption Footprint
-![Figure 4: Peak Heap Memory Consumption](file:///c:/Users/Sharanya%20Nagar/Desktop/Projects/connect-four/docs/figures/fig4_peak_memory_footprint.png)
+![Figure 4: Peak Heap Memory Consumption](figures/fig4_peak_memory_footprint.png)
 
 **Figure 4** reveals the structural memory consumption trade-offs between depth-first search and tree-growth algorithms:
 - **Minimax and Alpha-Beta**: Require minimal heap memory ($34.2\text{ KiB} - 48.6\text{ KiB}$) because depth-first search operates with $O(d)$ stack space complexity. Board state mutations are managed through in-place `make_move` and `undo_move` back-tracking, eliminating memory duplication.
@@ -120,7 +125,7 @@ As demonstrated in **Figure 1**, Vanilla Minimax exhibits catastrophic exponenti
 
 | Evaluation Dimension | Alpha-Beta Pruning (Minimax) | Monte Carlo Tree Search (UCT) |
 |---|---|---|
-| **Tactical Horizon** | **Guaranteed Defense up to depth $d$**. Evaluates every forced response; immune to blunders within search horizon. | **Statistical Horizon**. Deep playouts can detect late-game momentum, but may miss single-ply trap combinations if rollouts are noisy. |
+| **Tactical Horizon** | **Guaranteed Defense up to depth $d$**. Evaluates every forced response; immune to blunders within search horizon. | **Statistical Horizon**. Blocks 1-ply threats 100% via tactical guards, but can miss 2-to-3 ply fork setups without heuristic guidance. |
 | **Heuristic Dependency** | Highly dependent on handcrafted heuristic evaluation (e.g. 69-window weighting). Poor heuristics compromise move choice. | **Domain-Independent**. Can evaluate positions purely through random playout statistics without hand-tuned feature weights. |
 | **Time Flexibility** | Rigid depth limits require Iterative Deepening to support hard time budgets. | **Naturally Anytime**. Can terminate search at any millisecond deadline and return the most-visited child node. |
 | **Memory Complexity** | **$O(d)$ Call Stack**. Minimal heap footprint ($< 50\text{ KiB}$). | **$O(N)$ Tree Graph**. Grows linearly with simulation iterations ($300-600\text{ KiB}$). |
@@ -160,7 +165,7 @@ connect-four/
 │   ├── PEAS_AND_PROBLEM_STATEMENT.md
 │   ├── ALGORITHMS.md
 │   └── STAGE3_REPORT_SECTIONS_1_6_7.md
-├── tests/                     # Automated Pytest Suite (49 unit & integration tests)
+├── tests/                     # Automated Pytest Suite (53 unit & integration tests)
 ├── main.py                    # Unified CLI entrypoint
 ├── gui_main.py                # Graphical GUI launcher (Human vs AI & AI vs AI)
 ├── benchmark_cli.py           # Automated tournament CLI runner

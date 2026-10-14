@@ -54,12 +54,20 @@ This project investigates, implements, and benchmarks both paradigms head-to-hea
 | **Member 1** | *Algorithms & Core Logic* | Alpha-Beta pruning, 69-window heuristic evaluation, iterative deepening with time budgeting, theoretical formulation (`docs/ALGORITHMS.md`), empirical depth scaling and failure-mode analysis, Stage 3 report sections (2, 3, 4, 5, 8), slide outline. | ✅ **Week 1, 2 & 3 Complete** |
 | **Member 2** | *Engineering, GUI & Evaluation* | Modular repository scaffolding, PEAS formulation, performance instrumentation (`tracemalloc`, `perf_counter`), CLI & Pygame GUI, MCTS with UCT, automated tournament benchmark harness, Stage 3 report sections (1, 6, 7), viva guide. | ✅ **Week 1, 2 & 3 Complete** |
 
-### 📋 Week 3 Milestone Status (Member 1 Deliverables)
+### 📋 Week 3 Milestone Status (All Deliverables Complete)
+#### Member 1 (Person A) Deliverables
 - [x] **Scaling Experiments (`experiments_cli.py`)**: Depth-scaling complexity benchmarks for Minimax and Alpha-Beta up to depth 9 across empty and mid-game positions.
 - [x] **Empirical Metrics & Plotting**: Persisted experimental data in `docs/results/` (`depth_scaling.csv`, `iterative_scaling.csv`, `mcts_budget_scaling.csv`, `ordering_comparison.csv`) and generated publication charts (`fig5_depth_scaling.png`, `fig6_mcts_strength.png`).
 - [x] **Error & Failure-Mode Analysis**: Evaluated tactical horizon effects, one-move tactical guards, and MCTS simulation budget curves (50, 200, 500, 1000 rollouts).
 - [x] **Academic Report Sections**: Authored Sections 2, 3, 4, 5, and 8 in `docs/STAGE3_REPORT_SECTIONS_2_3_4_5_8.md`.
 - [x] **Viva Defense Slide Outline**: Comprehensive slide breakdown and speaker notes in `docs/SLIDES_MEMBER1.md`.
+
+#### Member 2 (Person B) Deliverables
+- [x] **Publication Plotting Suite (`plotter_cli.py`)**: Automated 300 DPI figure generator for execution latency, semi-log pruning scale, $5 \times 5$ win-rate heatmap, and peak heap memory footprint (`fig1`–`fig4`).
+- [x] **Tournament Benchmarking**: Multi-game tournament harness with alternating turns to eliminate first-player bias (`benchmark_cli.py`).
+- [x] **Academic Report Sections**: Authored Sections 1, 6, 7, and cross-section synthesis in `docs/STAGE3_REPORT_SECTIONS_1_6_7.md`.
+- [x] **Viva Defense Guide**: Complete defense guide, 3-minute opening pitch, live demonstration script, and model answers in `docs/VIVA_TALKING_POINTS_PERSON_B.md`.
+- [x] **Joint Defense Deck**: Unified 12-slide widescreen presentation deck combining both members' contributions with balanced speaking roles.
 
 ---
 
@@ -185,6 +193,9 @@ python experiments_cli.py --experiment block
 
 # 4. MCTS simulation budget sweep against Alpha-Beta (10 games per budget) with plot
 python experiments_cli.py --experiment mcts --games 10 --budgets 50 200 500 1000 --plot
+
+# 5. Generate high-DPI publication figures (Figs 1-4)
+python plotter_cli.py --output-dir docs/figures
 ```
 
 ---
@@ -237,7 +248,8 @@ connect-four/
 │   │   └── mcts_agent.py       # Monte Carlo Tree Search with UCT & dual budgeting
 │   ├── benchmark/              # Telemetry & Tournament Evaluation
 │   │   ├── instrumentation.py  # Sub-ms perf_counter & tracemalloc memory profiler
-│   │   └── runner.py           # Multi-game tournament runner with alternating turns
+│   │   ├── runner.py           # Multi-game tournament runner with alternating turns
+│   │   └── plotter.py          # Publication-grade Matplotlib plotting engine
 │   ├── cli/
 │   │   └── game_loop.py        # Terminal loop with live telemetry & board formatting
 │   └── gui/
@@ -251,7 +263,7 @@ connect-four/
 │   ├── SLIDES_MEMBER1.md       # Presentation slide outline (Member 1)
 │   ├── VIVA_TALKING_POINTS_PERSON_B.md # Viva preparation guide (Member 2)
 │   ├── results/                # CSV experimental outputs (depth scaling, MCTS, ordering)
-│   └── figures/                # Publication-quality benchmark visualization charts
+│   └── figures/                # Publication-quality benchmark visualization charts (Figs 1-6)
 ├── tests/                      # Automated Test Suite (53 Tests, 100% Pass)
 │   ├── test_board.py           # Board mechanics, gravity, edge cases (9 tests)
 │   ├── test_agents.py          # Random & Minimax baseline tests (4 tests)
@@ -267,6 +279,7 @@ connect-four/
 ├── gui_main.py                 # Pygame graphical application launcher
 ├── benchmark_cli.py            # Tournament evaluation runner
 ├── experiments_cli.py          # Scaling & failure-mode experimentation harness
+├── plotter_cli.py              # Automated publication figures generator
 └── requirements.txt            # Python dependencies (NumPy, Pygame, Pytest, Matplotlib)
 ```
 

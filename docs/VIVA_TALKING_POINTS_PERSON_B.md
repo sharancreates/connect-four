@@ -68,7 +68,7 @@ python plotter_cli.py --output-dir docs/figures
 > **Model Answer:**  
 > *"Vanilla Minimax must explore every leaf node across all legal branches, growing at $O(b^d)$ where $b \approx 7$. For depth 6, this requires $7^6 = 117,649$ evaluations.  
 > Alpha-Beta maintains two running bounds: $\alpha$ (the highest score guaranteed to the Maximizer) and $\beta$ (the lowest score guaranteed to the Minimizer). Whenever a sub-branch yields a score worse than the opponent's already guaranteed option ($\alpha \ge \beta$), the remaining children of that node cannot influence the root decision and are pruned.  
-> Crucially, because we sort candidate columns center-out (`[3, 2, 4, 1, 5, 0, 6]`), central moves—which participate in 21 distinct winning windows—are evaluated first. This establishes tight $\alpha$-$\beta$ bounds immediately, eliminating $98.4\%$ of the search tree ($1,890$ nodes vs $117,649$ nodes)."*
+> Crucially, because we sort candidate columns center-out (`[3, 2, 4, 1, 5, 0, 6]`), central moves—which participate in 51 distinct winning windows—are evaluated first. This establishes tight $\alpha$-$\beta$ bounds immediately, eliminating $98.4\%$ of the search tree ($1,890$ nodes vs $117,649$ nodes)."*
 
 ---
 
