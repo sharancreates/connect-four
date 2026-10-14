@@ -94,3 +94,17 @@ Enabling the 69-window heuristic evaluation allows Alpha-Beta to evaluate tactic
 - Why is the opponent's open three weighted -6 but our own +5?
 - Why does iterative deepening not waste time?
 - Why is the search run on a copy of the board?
+
+## 8. Week 3 additions (scaling and error analysis)
+
+Week 3 focused on systematic complexity profiling, failure-mode analysis, and head-to-head benchmarking between heuristic Alpha-Beta search and statistical Monte Carlo Tree Search:
+
+- **Experimentation Harness (`experiments_cli.py`):**
+  A dedicated testing harness to run automated depth-scaling benchmarks (depths 3 to 9), iterative deepening deadline rollbacks, one-move tactical block tests, and MCTS simulation budget sweeps (50, 200, 500, 1000 rollouts).
+- **Empirical Datasets (`docs/results/`):**
+  Outputs are persisted as structured CSVs: `depth_scaling.csv`, `iterative_scaling.csv`, `mcts_budget_scaling.csv`, and `ordering_comparison.csv`.
+- **Academic Milestone Report (`docs/STAGE3_REPORT_SECTIONS_2_3_4_5_8.md`):**
+  Contains formal mathematical specifications, depth-growth measurements, effective branching factor calculations ($b^* \approx N^{1/d}$ between 3.4 and 4.4), empirical throughput, and comprehensive error analysis covering tactical horizon effects, single-move guards, and budget sensitivity.
+- **Viva Defense Slides (`docs/SLIDES_MEMBER1.md`):**
+  Slide-by-slide presentation outline and speaker notes covering problem formulation, search algorithms, heuristic design, empirical complexity, and comparative failure modes.
+

@@ -60,6 +60,7 @@ updated: 2026-10-12T07:58:00+05:30
 - [x] Plan 3.1: Interactive Pygame GUI Polish & Controls (Member 2)
 - [x] Plan 3.2: Comparative Visualizations Suite & Figures Generation (Member 2)
 - [x] Plan 3.3: Stage 3 Academic Report (Sections 1, 6, 7) & Viva Defense Guide (Member 2)
+- [x] Plan 3.3b: Scaling & failure-mode experimentation, error analysis (Sections 2, 3, 4, 5, 8), and slide outline (Member 1)
 
 ---
 
@@ -69,7 +70,7 @@ updated: 2026-10-12T07:58:00+05:30
 |-------|--------|-------|----------|
 | 1 | ✅ | 3/3 | 100% |
 | 2 | ✅ | 3/3 | 100% |
-| 3 | ✅ | 3/3 | 100% |
+| 3 | ✅ | 4/4 | 100% |
 
 ---
 

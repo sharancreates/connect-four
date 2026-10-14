@@ -1,0 +1,5 @@
+simulations,games,mcts_wins,draws,mcts_losses,avg_plies_when_lost
+50,10,0,0,10,17.9
+200,10,0,0,10,30.9
+500,10,3,0,7,29.9
+1000,10,3,0,7,30.9

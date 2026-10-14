@@ -3,7 +3,7 @@
 # 🔴🟡 CONNECT FOUR AI
 ### *Adversarial Search meets Monte Carlo Tree Search*
 
-[![Tests](https://img.shields.io/badge/Test%20Suite-44%2F44%20Passing-10B981?style=for-the-badge&logo=pytest&logoColor=white)]()
+[![Tests](https://img.shields.io/badge/Test%20Suite-53%2F53%20Passing-10B981?style=for-the-badge&logo=pytest&logoColor=white)]()
 [![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11-3776AB?style=for-the-badge&logo=python&logoColor=white)]()
 [![Pygame](https://img.shields.io/badge/GUI-Pygame%20Interactive-E11D48?style=for-the-badge&logo=gamemaker&logoColor=white)]()
 [![Course](https://img.shields.io/badge/Course-ECSCT24301-8B5CF6?style=for-the-badge)]()
@@ -51,8 +51,15 @@ This project investigates, implements, and benchmarks both paradigms head-to-hea
 
 | Role | Member | Responsibilities | Status |
 | :--- | :--- | :--- | :---: |
-| **Member 1** | *Algorithms & Core Logic* | Alpha-Beta pruning, 69-window heuristic evaluation, iterative deepening with time budgeting, theoretical formulation (`docs/ALGORITHMS.md`). | ✅ **Week 1 & 2 Complete** |
-| **Member 2** | *Engineering, GUI & Evaluation* | Modular repository scaffolding, PEAS formulation, performance instrumentation (`tracemalloc`, `perf_counter`), CLI & Pygame GUI, MCTS with UCT, automated tournament benchmark harness. | ✅ **Week 1 & 2 Complete** |
+| **Member 1** | *Algorithms & Core Logic* | Alpha-Beta pruning, 69-window heuristic evaluation, iterative deepening with time budgeting, theoretical formulation (`docs/ALGORITHMS.md`), empirical depth scaling and failure-mode analysis, Stage 3 report sections (2, 3, 4, 5, 8), slide outline. | ✅ **Week 1, 2 & 3 Complete** |
+| **Member 2** | *Engineering, GUI & Evaluation* | Modular repository scaffolding, PEAS formulation, performance instrumentation (`tracemalloc`, `perf_counter`), CLI & Pygame GUI, MCTS with UCT, automated tournament benchmark harness, Stage 3 report sections (1, 6, 7), viva guide. | ✅ **Week 1, 2 & 3 Complete** |
+
+### 📋 Week 3 Milestone Status (Member 1 Deliverables)
+- [x] **Scaling Experiments (`experiments_cli.py`)**: Depth-scaling complexity benchmarks for Minimax and Alpha-Beta up to depth 9 across empty and mid-game positions.
+- [x] **Empirical Metrics & Plotting**: Persisted experimental data in `docs/results/` (`depth_scaling.csv`, `iterative_scaling.csv`, `mcts_budget_scaling.csv`, `ordering_comparison.csv`) and generated publication charts (`fig5_depth_scaling.png`, `fig6_mcts_strength.png`).
+- [x] **Error & Failure-Mode Analysis**: Evaluated tactical horizon effects, one-move tactical guards, and MCTS simulation budget curves (50, 200, 500, 1000 rollouts).
+- [x] **Academic Report Sections**: Authored Sections 2, 3, 4, 5, and 8 in `docs/STAGE3_REPORT_SECTIONS_2_3_4_5_8.md`.
+- [x] **Viva Defense Slide Outline**: Comprehensive slide breakdown and speaker notes in `docs/SLIDES_MEMBER1.md`.
 
 ---
 
@@ -119,7 +126,7 @@ pip install -r requirements.txt
 ```bash
 python -m pytest tests/ -v
 ```
-> *Runs all 44 unit and integration tests across board mechanics, heuristics, search parity, MCTS, and GUI logic in < 3 seconds.*
+> *Runs all 53 unit and integration tests across board mechanics, heuristics, search parity, MCTS, and GUI logic in ~25-30 seconds.*
 
 ---
 
@@ -158,6 +165,26 @@ Auto-run an $N$-game tournament between any two agents with alternating starting
 
 ```bash
 python benchmark_cli.py --agent1 alphabeta --agent2 mcts --games 10 --depth1 4 --simulations2 300 --verbose
+```
+
+---
+
+### 📈 6. Scaling & Failure-Mode Experimentation Runner (`experiments_cli.py`)
+
+Run dedicated empirical complexity experiments, iterative deepening tests, tactical block benchmarks, and MCTS budget sweeps:
+
+```bash
+# 1. Depth-scaling complexity benchmark (Minimax & Alpha-Beta to depth 9) with plot
+python experiments_cli.py --experiment depth --plot
+
+# 2. Iterative deepening deadline test across multiple time allocations
+python experiments_cli.py --experiment iterative
+
+# 3. Tactical block test verifying immediate threat response
+python experiments_cli.py --experiment block
+
+# 4. MCTS simulation budget sweep against Alpha-Beta (10 games per budget) with plot
+python experiments_cli.py --experiment mcts --games 10 --budgets 50 200 500 1000 --plot
 ```
 
 ---
@@ -218,8 +245,14 @@ connect-four/
 ├── docs/                       # Academic & Engineering documentation
 │   ├── CODING_CONVENTIONS.md   # PEP 8, type hints & collaboration standards
 │   ├── PEAS_AND_PROBLEM_STATEMENT.md # Academic PEAS & formal state-space draft
-│   └── ALGORITHMS.md           # Mathematical formulations, heuristic windows & proofs
-├── tests/                      # Automated Test Suite (44 Tests, 100% Pass)
+│   ├── ALGORITHMS.md           # Mathematical formulations, heuristic windows & proofs
+│   ├── STAGE3_REPORT_SECTIONS_1_6_7.md # Academic report sections (Member 2)
+│   ├── STAGE3_REPORT_SECTIONS_2_3_4_5_8.md # Academic report sections (Member 1)
+│   ├── SLIDES_MEMBER1.md       # Presentation slide outline (Member 1)
+│   ├── VIVA_TALKING_POINTS_PERSON_B.md # Viva preparation guide (Member 2)
+│   ├── results/                # CSV experimental outputs (depth scaling, MCTS, ordering)
+│   └── figures/                # Publication-quality benchmark visualization charts
+├── tests/                      # Automated Test Suite (53 Tests, 100% Pass)
 │   ├── test_board.py           # Board mechanics, gravity, edge cases (9 tests)
 │   ├── test_agents.py          # Random & Minimax baseline tests (4 tests)
 │   ├── test_alphabeta.py       # Alpha-Beta parity & pruning verification (4 tests)
@@ -233,6 +266,7 @@ connect-four/
 ├── main.py                     # Primary CLI executable runner
 ├── gui_main.py                 # Pygame graphical application launcher
 ├── benchmark_cli.py            # Tournament evaluation runner
+├── experiments_cli.py          # Scaling & failure-mode experimentation harness
 └── requirements.txt            # Python dependencies (NumPy, Pygame, Pytest, Matplotlib)
 ```
 
@@ -249,8 +283,8 @@ connect-four/
   • Alpha-Beta Pruning • 69-Window Heuristic • Iterative Deepening • MCTS (UCT) • Pygame GUI
                                      │
                                      ▼
-  [ Week 3: Tournament & Scientific Report ] ──► NEXT UP
-  • Large-scale Tournament Benchmarks • Matplotlib Visualizations • Final Report & Viva
+  [ Week 3: Tournament, Scaling & Scientific Report ] ──► COMPLETE (53/53 tests)
+  • Large-scale Tournament Benchmarks • Scaling & Error Analysis • Final Report & Slides
 ```
 
 ---
