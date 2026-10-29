@@ -287,7 +287,7 @@ def plot_winrate_matrix_heatmap(
             )
 
     ax.set_title(
-        "Figure 3: Head-to-Head Tournament Win-Rate Matrix (N=20 Games/Pair)",
+        "Figure 3: Tournament Win Rates (20 games per pair)\nDraws count as 0 for both agents",
         fontsize=13,
         fontweight="bold",
         pad=16,
