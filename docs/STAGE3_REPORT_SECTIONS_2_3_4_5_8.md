@@ -250,7 +250,7 @@ Let $b$ be the branching factor ($\le 7$) and $d$ the search depth.
 | Mid-game | Alpha-Beta | 3 / 4 / 7 / 8 / 9 | 129 / 263 / 25,507 / 45,346 / 385,217 | 4.8 / 11.4 / 854.8 / 1211.2 / 9477.1 |
 | Mid-game | Alpha-Beta + heuristic | 3 / 4 / 5 / 6 / 7 / 8 / 9 | 151 / 396 / 1,969 / 4,747 / 31,833 / 73,986 / 460,830 | 11.2 / 22.0 / 104.5 / 195.0 / 1455.9 / 2689.3 / 30938.1 |
 
-*(Figure 5, `docs/figures/fig5_depth_scaling.png`, plots time per move against depth on a log scale for the mid-game position.)*
+*(Figure 1 and Figure 2, `docs/figures/fig1_execution_time_vs_depth.png` and `docs/figures/fig2_nodes_expanded_log_scale.png`, plot move latency and search tree node expansions against depth for empty and mid-game positions.)*
 
 ### 5.3 Effective Branching Factor
 The effective branching factor is estimated as $b^* \approx N^{1/d}$ where $N$ is the total node count.
@@ -273,8 +273,8 @@ Comparison with theory:
 4. **Growth is not smooth.** On the empty board the cost ratio between consecutive depths is 3.3 (4 to 5 is $172 \to 563$), 2.2 ($563 \to 1{,}248$) and 3.9 ($1{,}248 \to 4{,}904$). The alternating ratio is consistent with an odd/even depth effect in Alpha-Beta pruning; this is an observation from one position, not a tested explanation. Similarly, the cost ratio between consecutive depths in the mid-game position is uneven (for example 1.8x from depth 7 to 8 and 8.5x from depth 8 to 9 for plain Alpha-Beta).
 
 ### 5.4 Throughput and Space
-- **Throughput.** Alpha-Beta processes about 26,000 nodes per second in this Python implementation (4,904 nodes in 184.1 ms at depth 7); with the heuristic about 17,500 to 25,000 nodes per second. A compiled implementation with bitboards would be much faster, but the node counts, which do not depend on the language, would stay the same.
-- **Space.** Minimax and Alpha-Beta store only the current path ($O(d)$), thanks to `make_move` / `undo_move`. MCTS stores a tree that grows with the simulation budget (Section 6, Figure 4).
+- **Throughput.** Alpha-Beta processes about 26,000 nodes per second in this Python implementation (for example 1,624 nodes in 63.2 ms at depth 5 mid-game, ~25,700 nodes/s; 4,904 nodes in 433.9 ms at depth 7 on empty board, ~11,300 nodes/s); with the heuristic about 17,500 to 25,000 nodes per second. A compiled implementation with bitboards would be much faster, but the node counts, which do not depend on the language, would stay the same.
+- **Space.** Minimax and Alpha-Beta store only the current path ($O(d)$), thanks to `make_move` / `undo_move`. MCTS stores an explicit tree graph ((N)$) that grows with the simulation budget.
 - **Where each method becomes impractical.** In the mid-game position, Alpha-Beta with the heuristic takes 1.46 s at depth 7, 2.69 s at depth 8, and jumps to 30.94 s per move at depth 9 (460,830 nodes) (one run; times vary between runs), confirming the exponential cliff where unassisted fixed-depth search exceeds interactive time limits. Plain Alpha-Beta at depth 9 on the same position takes 9.48 s (385,217 nodes).
 
 ---
@@ -312,7 +312,7 @@ Lost games are much shorter at 50 simulations (17.9 plies) than at 200 or more (
 
 **(c) Noisy evaluation at low budgets.** With few simulations, each child receives only a handful of random playouts, so its win-rate estimate has high variance and the most-visited move can be chosen by chance.
 
-**(d) Memory grows with the budget.** The tree is stored in memory and grows with the number of simulations (Section 6, Figure 4), unlike Alpha-Beta.
+**(d) Memory grows with the budget.** The tree is stored in memory and grows with the number of simulations ((N)$ dynamic tree nodes), unlike Alpha-Beta.
 
 ### 8.3 Comparative Summary
 | Aspect | Alpha-Beta (+ iterative deepening) | MCTS |

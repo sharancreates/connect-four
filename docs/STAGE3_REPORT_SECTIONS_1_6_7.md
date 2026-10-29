@@ -36,8 +36,8 @@ In accordance with Russell & Norvig’s AI agent framework, the Connect Four pro
 
 | PEAS Dimension | Specification for Connect Four AI System |
 |---|---|
-| **Performance Measure (P)** | • **Win Rate**: Percentage of tournament games won against opponent agents.<br>• **Decision Latency**: Mean computation time per ply (target $\le 300\text{ ms}$).<br>• **Search Efficiency**: Node expansion minimization and effective branching factor $b^*$.<br>• **Memory Allocation**: Peak heap memory footprint recorded via `tracemalloc` ($\le 5\text{ MB}$). |
-| **Environment (E)** | • **Grid Dimensions**: $6 \text{ rows} \times 7 \text{ columns}$ discrete board containing 42 discrete cells.<br>• **State Representation**: 2D signed integer matrix $\mathbf{S} \in \{-1, 0, +1\}^{6 \times 7}$.<br>• **Turn Dynamic**: Strict alternating sequential turns governed by gravity physics. |
+| **Performance Measure (P)** | • **Win Rate**: Percentage of tournament games won against opponent agents.<br>• **Decision Latency**: Mean computation time per ply (target $\le 300\text{ ms}$).<br>• **Search Efficiency**: Node expansion minimization and effective branching factor $b^*$. |
+| **Environment (E)** | • **Grid Dimensions**: $6 \text{ rows} \times 7 \text{ columns}$ discrete board containing 42 discrete cells.<br>• **State Representation**: 2D signed integer matrix $\mathbf{S} \in \{-1, 0, +1\}^{6 \times 7}$ stored as a contiguous NumPy `int8` array.<br>• **Turn Dynamic**: Strict alternating sequential turns governed by gravity physics. |
 | **Actuators (A)** | • **Action Space**: Column selection $a \in \mathcal{A}(s) \subseteq \{0, 1, 2, 3, 4, 5, 6\}$ where top cell $\mathbf{S}[0, a] == 0$.<br>• **State Transition**: Deterministic disc drop $T(s, a) \rightarrow s'$ to row $r = \max \{i \mid \mathbf{S}[i, a] == 0\}$. |
 | **Sensors (S)** | • **Full Observability**: Direct programmatic access to entire $6 \times 7$ grid buffer.<br>• **Turn Sensor**: Current active player identity ($p \in \{+1, -1\}$).<br>• **Legal Move Sensor**: Array of available non-full column indices.<br>• **Terminal Sensor**: Directional four-in-a-row detector and board fullness detector. |
 
@@ -54,70 +54,93 @@ In accordance with Russell & Norvig’s AI agent framework, the Connect Four pro
 ## Section 6: Comparative Empirical Evaluation & Experimental Results
 
 ### 6.1 Experimental Methodology & Setup
-To ensure rigorous, statistically sound, and unbiased evaluation, all empirical experiments were executed under standardized test protocols:
-- **Hardware & Environment**: Intel Core i7 / AMD Ryzen architecture, Python 3.10.11 runtime, Windows 11 64-bit OS.
-- **Tournament Orchestration**: Matches were executed using `BenchmarkRunner` (`connect4/benchmark/runner.py`).
-- **First-Mover Bias Neutralization**: In each head-to-head match series ($N = 20$ games per pair), starting turns were strictly alternated (Player 1 as Red in 50% of games, Player 2 as Yellow in 50% of games).
+To ensure reproducible and unbiased evaluation, all empirical experiments were executed under standardized test protocols:
+- **Environment**: Python 3.10+ runtime, Windows 64-bit OS.
+- **Tournament Orchestration**: Matches were executed using `BenchmarkRunner` (`connect4/benchmark/runner.py`) and recorded in `docs/results/tournament.csv`.
+- **First-Mover Bias Neutralization**: In each head-to-head match series ($N = 20$ games per pair), starting turns were strictly alternated (Player 1 as Red in 10 games, Player 2 as Yellow in 10 games).
 - **Measurement Instrumentation**:
-  - Wall-clock decision time measured via high-precision `time.perf_counter()`.
-  - Peak memory heap allocation measured via Python's standard library `tracemalloc`.
-  - Node and playout expansions tracked transparently using the `NodeCounter` callback interface.
+  - Wall-clock decision time measured via high-precision `time.perf_counter()`. Single-run timings are subject to system noise; node counts are exact.
+  - Node and playout expansions tracked transparently using the `NodeCounter` callback interface. Nodes count every recursive call.
 
 ### 6.2 Quantitative Benchmark Results
 
-| Agent Algorithm | Parameter Configuration | Mean Move Latency (ms) | Peak Memory (`tracemalloc` KiB) | Nodes / Simulations per Move | Effective Branching Factor ($b^*$) | Tournament Win Rate vs. Random |
-|---|---|---|---|---|---|---|
-| **Random Baseline** | Uniform Stochastic | $0.012 \pm 0.003$ | $18.4 \text{ KiB}$ | $1$ | $1.00$ | $50.0\%$ (vs Self) |
-| **Vanilla Minimax** | Depth $d = 3$ | $11.45 \pm 1.20$ | $34.2 \text{ KiB}$ | $343 \pm 42$ | $6.98$ | $90.0\%$ |
-| **Vanilla Minimax** | Depth $d = 4$ | $78.90 \pm 6.80$ | $42.1 \text{ KiB}$ | $2,401 \pm 180$ | $6.99$ | $95.0\%$ |
-| **Alpha-Beta (Default)** | Depth $d = 4$ | $12.80 \pm 1.40$ | $44.5 \text{ KiB}$ | $312 \pm 55$ | $4.20$ | $95.0\%$ |
-| **Alpha-Beta (Center Order)** | Depth $d = 4$ | $7.40 \pm 0.85$ | $45.2 \text{ KiB}$ | $174 \pm 28$ | $3.63$ | $100.0\%$ |
-| **Alpha-Beta (Center Order)** | Depth $d = 6$ | $88.50 \pm 7.90$ | $48.6 \text{ KiB}$ | $1,890 \pm 210$ | $3.51$ | $100.0\%$ |
-| **Iterative Deepening** | Deadline $t = 200\text{ ms}$ | $192.40 \pm 12.10$ | $52.3 \text{ KiB}$ | $4,120 \pm 480$ | $3.54$ | $100.0\%$ |
-| **MCTS (UCT)** | $N = 200 \text{ rollouts}$ | $56.10 \pm 4.20$ | $172.0 \text{ KiB}$ | $200 \text{ rollouts}$ | N/A (Tree Policy) | $90.0\%$ |
-| **MCTS (UCT)** | $N = 500 \text{ rollouts}$ | $112.50 \pm 8.90$ | $312.8 \text{ KiB}$ | $500 \text{ rollouts}$ | N/A (Tree Policy) | $95.0\%$ |
-| **MCTS (UCT)** | $N = 1000 \text{ rollouts}$ | $226.00 \pm 16.40$ | $624.5 \text{ KiB}$ | $1,000 \text{ rollouts}$ | N/A (Tree Policy) | $100.0\%$ |
+#### Table 6.1: Round-Robin Tournament Standings (200 Games, 20 per pair, Alternating First Mover)
+*Scoring convention: 1 point for a win, 0.5 points for a draw, 0 points for a loss. Total points out of 80 possible across 4 opponent pairings.*
 
-> **Measurement Methodology & Counting Notes:**  
-> 1. **Tournament Mean vs. Single Position**: The figures reported above reflect mean move-by-move deliberation metrics averaged across full 40-ply tournament matches. While opening-move Alpha-Beta ($d=6$) on an empty board expands $\approx 1,248$ nodes and dense mid-game positions reach $\approx 4,747$ nodes (as detailed in Section 4 & 5), the mean deliberation across full gameplay stabilizes at $1,890 \pm 210$ nodes.  
-> 2. **Node Counting Convention**: The Minimax entry reports the theoretical leaf evaluation count $7^d$ ($343$ leaves at $d=3$), whereas total tree node traversals including internal branch states equal $\sum_{i=1}^d 7^i = 399$ nodes ($400$ including the root state).  
-> 3. **Move Ordering Comparison**: The "Alpha-Beta (Default)" baseline evaluates legal columns in left-to-right order ($0 \dots 6$), whereas our primary `AlphaBetaAgent` employs center-out priority (`[3, 2, 4, 1, 5, 0, 6]`), isolating the direct contribution of domain move ordering to pruning efficiency.
+| Agent Algorithm | Parameter Configuration | Points (out of 80) | Score % | Head-to-Head Pairings (W-D-L vs Opponents) |
+|---|---|---|---|---|
+| **Alpha-Beta** | Depth $d = 6$ | **57.0** | $71.3\%$ | vs Random: 20-0-0; vs Minimax (d=3): 10-10-0; vs AlphaBeta (d=4): 0-20-0; vs MCTS (N=500): 12-0-8 |
+| **Alpha-Beta** | Depth $d = 4$ | **55.5** | $69.4\%$ | vs Random: 20-0-0; vs Minimax (d=3): 10-10-0; vs AlphaBeta (d=6): 0-20-0; vs MCTS (N=500): 10-1-9 |
+| **MCTS (UCT)** | $N = 500 \text{ rollouts}$ | **52.5** | $65.6\%$ | vs Random: 20-0-0; vs Minimax (d=3): 15-0-5; vs AlphaBeta (d=4): 9-1-10; vs AlphaBeta (d=6): 8-0-12 |
+| **Minimax** | Depth $d = 3$ | **35.0** | $43.8\%$ | vs Random: 20-0-0; vs AlphaBeta (d=4): 0-10-10; vs AlphaBeta (d=6): 0-10-10; vs MCTS (N=500): 5-0-15 |
+| **Random Baseline** | Uniform Stochastic | **0.0** | $0.0\%$ | vs Random: N/A; vs all 4 competitive agents: 0-0-20 each (0-0-80 overall) |
+
+> **Tournament Analysis Notes:**  
+> 1. **Statistical Separation**: The top three agents (Alpha-Beta $d=6$, Alpha-Beta $d=4$, and MCTS $N=500$) are separated by only 4.5 points out of 80 and cannot be separated statistically with 20 games per pair.  
+> 2. **Deterministic Pairings**: Minimax and Alpha-Beta are fully deterministic. Consequently, pairings between two deterministic agents produce identical games for a given starting mover (effectively 2 distinct games per pair across 20 iterations).  
+> 3. **Defensive Parity**: All 20 games between Alpha-Beta ($d=4$) and Alpha-Beta ($d=6$) resulted in draws (0-20-0), demonstrating that depth 4 with heuristic evaluation is sufficient to hold a draw against depth 6 under alternating starts.
+
+#### Table 6.2: Search Space Expansion & Pruning Efficiency (`docs/results/depth_scaling.csv`)
+*Nodes count every recursive call. Minimax was evaluated up to depth 5 only.*
+
+| Position | Search Depth ($d$) | Minimax Nodes | Minimax Time (ms) | Alpha-Beta Nodes | Alpha-Beta Time (ms) | Node Reduction (%) |
+|---|---|---|---|---|---|---|
+| **Empty Board** | $d = 1$ | 7 | 0.70 | 7 | 0.77 | 0.0% |
+| **Empty Board** | $d = 2$ | 56 | 1.42 | 20 | 1.43 | 64.3% |
+| **Empty Board** | $d = 3$ | 399 | 21.06 | 75 | 2.38 | 81.2% |
+| **Empty Board** | $d = 4$ | 2,800 | 114.05 | 172 | 9.15 | 93.9% |
+| **Empty Board** | $d = 5$ | 19,607 | 633.85 | 563 | 28.25 | **97.1%** (~22× faster) |
+| **Empty Board** | $d = 6$ | — | — | 1,248 | 49.42 | — |
+| **Empty Board** | $d = 7$ | — | — | 4,904 | 433.89 | — |
+| **Empty Board** | $d = 8$ | — | — | 8,646 | 484.74 | — |
+| **Empty Board** | $d = 9$ | — | — | 33,169 | 1551.63 | — |
+| **Mid-Game** | $d = 1$ | 7 | 0.28 | 7 | 0.85 | 0.0% |
+| **Mid-Game** | $d = 2$ | 56 | 5.48 | 20 | 1.44 | 64.3% |
+| **Mid-Game** | $d = 3$ | 399 | 19.46 | 129 | 4.81 | 67.7% |
+| **Mid-Game** | $d = 4$ | 2,715 | 104.37 | 263 | 11.41 | 90.3% |
+| **Mid-Game** | $d = 5$ | 18,544 | 619.11 | 1,624 | 63.17 | **91.2%** (~10× faster) |
+| **Mid-Game** | $d = 6$ | — | — | 2,967 | 114.13 | — |
+| **Mid-Game** | $d = 7$ | — | — | 25,507 | 854.81 | — |
+| **Mid-Game** | $d = 8$ | — | — | 45,346 | 1211.16 | — |
+| **Mid-Game** | $d = 9$ | — | — | 385,217 | 9477.09 | — |
 
 ---
 
 ### 6.3 In-Depth Analysis of Publication Figures
 
-#### Figure 1: Execution Time (Latency) vs. Search Depth
+#### Figure 1: Mean Move Latency vs. Search Depth
 ![Figure 1: Mean Move Latency vs Search Depth](figures/fig1_execution_time_vs_depth.png)
 
-As demonstrated in **Figure 1**, Vanilla Minimax exhibits catastrophic exponential scaling as search depth increases:
-- At depth $d = 4$, Minimax requires $78.9\text{ ms}$, escalating sharply to $3,750\text{ ms}$ at depth $d = 6$.
-- In contrast, Alpha-Beta pruning with center-out move ordering (`[3, 2, 4, 1, 5, 0, 6]`) completes depth 6 in just $88.5\text{ ms}$—achieving a **$42.4\times$ speedup** over unpruned Minimax.
-- Center-out ordering accelerates cutoff frequency because central column discs participate in 51 distinct 4-in-a-row scoring windows (all 24 horizontal, all 24 diagonal, and 3 vertical windows across column 3), yielding strong heuristic bounds early in the search tree.
+As demonstrated in **Figure 1**, Vanilla Minimax exhibits rapid exponential latency growth:
+- On the empty board at depth $d = 5$, Minimax requires $633.85\text{ ms}$, whereas Alpha-Beta completes in $28.25\text{ ms}$ (approximately $22\times$ faster).
+- In the mid-game position at depth $d = 5$, Minimax consumes $619.11\text{ ms}$ versus $63.17\text{ ms}$ for Alpha-Beta (approximately $10\times$ faster).
+- For Alpha-Beta, search remains responsive through depth 6 ($49.42\text{ ms}$ empty, $114.13\text{ ms}$ mid-game). However, moving to depth 9 requires $1,551.6\text{ ms}$ on the empty board and escalates to $9,477.1\text{ ms}$ in the mid-game ($30,938.1\text{ ms}$ with the 69-window heuristic), illustrating the exponential scaling cliff where fixed-depth search exceeds interactive limits.
 
-#### Figure 2: Search Space Expansion (Logarithmic Scale)
+#### Figure 2: Search Tree Node Expansions (Logarithmic Scale)
 ![Figure 2: Search Space Expansion vs Depth](figures/fig2_nodes_expanded_log_scale.png)
 
-**Figure 2** highlights the theoretical and empirical power of adversarial pruning plotted on a $\log_{10}$ semi-log scale:
-- At depth $d = 6$, Vanilla Minimax is forced to expand all $7^6 = 117,649$ nodes.
-- Alpha-Beta pruning without move ordering expands $4,210$ nodes (a $96.4\%$ reduction).
-- With center-out move ordering, expansions plummet to **$1,890$ nodes**, achieving an empirical **$98.39\%$ branch pruning efficiency**.
-- This validates Knuth & Moore's asymptotic theorem: under near-optimal move ordering, Alpha-Beta's effective branching factor approaches $b^* \approx \sqrt{b} = \sqrt{7} \approx 2.65$, allowing search to reach double the depth of standard Minimax within the same time budget.
+**Figure 2** highlights the theoretical and empirical power of adversarial pruning plotted on a $\log_{10}$ semi-log scale across both positions:
+- At depth $d = 5$ on the empty board, Vanilla Minimax expands $19,607$ nodes while Alpha-Beta expands only $563$ nodes—an empirical **$97.1\%$ reduction in search tree size**.
+- In the mid-game position at depth $d = 5$, Minimax expands $18,544$ nodes compared to $1,624$ nodes for Alpha-Beta (**$91.2\%$ reduction**).
+- Center-out move ordering (`[3, 2, 4, 1, 5, 0, 6]`) ensures central columns—which participate in 51 distinct 4-in-a-row winning lines—are evaluated first, establishing tight $\alpha$-$\beta$ cutoffs early in tree traversal.
+- The effective branching factor for Alpha-Beta stabilizes between $b^* \approx 3.4$ (empty board) and $b^* \approx 4.3$ (mid-game), lying strictly between optimal $O(b^{d/2})$ ($\sqrt{7} \approx 2.65$) and worst-case $O(b^d)$ ($7.0$).
 
 #### Figure 3: Head-to-Head Tournament Win-Rate Heatmap
 ![Figure 3: Head-to-Head Tournament Win-Rate Matrix](figures/fig3_tournament_winrate_heatmap.png)
 
-**Figure 3** illustrates the comprehensive $5 \times 5$ tournament win-rate matrix across $N = 20$ matches per pairing:
-- **Alpha-Beta Dominance**: Alpha-Beta ($d=6$) emerges as the tournament champion, achieving a $70.0\%$ win rate against MCTS ($N=500$) and $100\%$ against baseline agents.
-- **MCTS Tactical Horizon**: MCTS with tactical guards achieves 100% reliability on immediate 1-ply winning moves and 1-ply threat blocking (blocking 20/20 in empirical block tests, Section 8.2a). However, against deep Alpha-Beta ($d=6$), MCTS can remain vulnerable to multi-ply combinations—specifically forks or double-threat alignments set up 2 to 3 plies in advance, where two winning threats are created simultaneously. Because unguided random rollouts cannot reliably identify deep multi-turn trap setups, Alpha-Beta's exhaustive tactical lookahead maintains an edge.
-- **First-Player Edge**: Across all agent matchups, Player 1 (first mover) maintained an average $56.8\%$ win-rate advantage, verifying the theoretical bias established by Allen and Allis.
+**Figure 3** illustrates the complete round-robin tournament results ($N = 20$ games per pairing, alternating first mover) displaying `W-D-L` records and row-agent score percentages:
+- **Top Tier Clustering**: Alpha-Beta ($d=6$, 57.0 pts), Alpha-Beta ($d=4$, 55.5 pts), and MCTS ($N=500$, 52.5 pts) form a tightly clustered top tier that cannot be separated with statistical significance.
+- **Head-to-Head Balance**: Against MCTS ($N=500$), Alpha-Beta ($d=6$) won 12 games and lost 8 (60.0% score), while Alpha-Beta ($d=4$) won 10, drew 1, and lost 9 (52.5% score).
+- **All-Draw Pairings**: Alpha-Beta ($d=4$) vs. Alpha-Beta ($d=6$) drew all 20 games (0-20-0, 50.0% score), demonstrating that both depths find identical drawing lines under deterministic play.
+- **Minimax Baseline**: Minimax ($d=3$) defeated Random 20-0-0, secured 10 draws each against Alpha-Beta ($d=4$) and Alpha-Beta ($d=6$), and won 5 games against MCTS ($N=500$), finishing with 35.0 points.
 
-#### Figure 4: Peak Memory Consumption Footprint
-![Figure 4: Peak Heap Memory Consumption](figures/fig4_peak_memory_footprint.png)
+#### Figure 6: MCTS Scaling vs. Alpha-Beta (d=4, Heuristic)
+![Figure 6: MCTS Scaling vs Alpha-Beta](figures/fig6_mcts_strength.png)
 
-**Figure 4** reveals the structural memory consumption trade-offs between depth-first search and tree-growth algorithms:
-- **Minimax and Alpha-Beta**: Require minimal heap memory ($34.2\text{ KiB} - 48.6\text{ KiB}$) because depth-first search operates with $O(d)$ stack space complexity. Board state mutations are managed through in-place `make_move` and `undo_move` back-tracking, eliminating memory duplication.
-- **MCTS**: Allocates stateful `MCTSNode` objects on the heap for every expanded node. At $N=500$ rollouts, peak memory reaches $312.8\text{ KiB}$, scaling linearly to $624.5\text{ KiB}$ at $N=1000$ rollouts. While higher than Alpha-Beta, this footprint remains well within the target embedded budget ($\le 5\text{ MB}$).
+**Figure 6** plots the performance of MCTS across simulation budgets ($N \in \{50, 200, 500, 1000\}$) against Alpha-Beta ($d=4$, heuristic) across 10 games per budget (`docs/results/mcts_vs_alphabeta.csv`):
+- **Win Rate Trajectory**: MCTS won 0 of 10 games at $N=50$ and $N=200$ simulations, rising to 3 of 10 games at both $N=500$ and $N=1000$. Increasing the budget beyond 500 simulations did not yield additional wins in this 10-game sample.
+- **Game Length Resistance**: Games lost by MCTS were significantly shorter at 50 simulations ($17.9$ plies on average) than at 200 or more simulations ($\approx 30.9$ plies). Beyond 200 simulations, the average game length remains flat.
+- **Tactical Check**: In isolated single-threat blocking tests (`docs/results/block_test.csv`), MCTS successfully blocked immediate 1-ply winning threats in 20 of 20 trials across all budgets ($N \in \{5, 20, 100, 500\}$) due to its root-level tactical check.
 
 ---
 
@@ -125,10 +148,10 @@ As demonstrated in **Figure 1**, Vanilla Minimax exhibits catastrophic exponenti
 
 | Evaluation Dimension | Alpha-Beta Pruning (Minimax) | Monte Carlo Tree Search (UCT) |
 |---|---|---|
-| **Tactical Horizon** | **Guaranteed Defense up to depth $d$**. Evaluates every forced response; immune to blunders within search horizon. | **Statistical Horizon**. Blocks 1-ply threats 100% via tactical guards, but can miss 2-to-3 ply fork setups without heuristic guidance. |
+| **Tactical Horizon** | **Guaranteed Defense up to depth $d$**. Evaluates all forced replies; immune to blunders within search horizon. | **Statistical Horizon**. Blocks 1-ply threats reliably via root tactical check, but may miss deeper multi-ply combinations without deep rollouts. |
 | **Heuristic Dependency** | Highly dependent on handcrafted heuristic evaluation (e.g. 69-window weighting). Poor heuristics compromise move choice. | **Domain-Independent**. Can evaluate positions purely through random playout statistics without hand-tuned feature weights. |
 | **Time Flexibility** | Rigid depth limits require Iterative Deepening to support hard time budgets. | **Naturally Anytime**. Can terminate search at any millisecond deadline and return the most-visited child node. |
-| **Memory Complexity** | **$O(d)$ Call Stack**. Minimal heap footprint ($< 50\text{ KiB}$). | **$O(N)$ Tree Graph**. Grows linearly with simulation iterations ($300-600\text{ KiB}$). |
+| **Spatial Complexity** | **$O(d)$ Call Stack**. Minimal heap footprint; board mutated and reverted in-place via `make_move()` and `undo_move()`. | **$O(N)$ Tree Graph**. Dynamic node graph instantiated on the heap that grows linearly with simulation iterations. |
 
 ---
 
@@ -152,7 +175,7 @@ connect-four/
 │   │   ├── mcts_agent.py      # Monte Carlo Tree Search with UCT & tactical guards
 │   │   └── heuristic.py       # Precomputed 69-window sliding evaluator
 │   ├── benchmark/             # Evaluation & Instrumentation Layer
-│   │   ├── instrumentation.py # MetricsTracker (time.perf_counter & tracemalloc)
+│   │   ├── instrumentation.py # MetricsTracker (time.perf_counter & NodeCounter)
 │   │   ├── runner.py          # BenchmarkRunner multi-game tournament orchestrator
 │   │   └── plotter.py         # Headless Matplotlib publication plotting suite
 │   ├── gui/                   # Interactive Presentation Layer
@@ -161,22 +184,23 @@ connect-four/
 │   └── cli/                   # Console Interface Layer
 │       └── game_loop.py       # Rich CLI game runner
 ├── docs/                      # Technical Documentation & Deliverables
-│   ├── figures/               # High-DPI (300 DPI) publication figures (Fig 1-4)
+│   ├── figures/               # High-DPI publication figures (Fig 1, 2, 3, 6)
+│   ├── results/               # Empirical benchmark CSV datasets
 │   ├── PEAS_AND_PROBLEM_STATEMENT.md
 │   ├── ALGORITHMS.md
 │   └── STAGE3_REPORT_SECTIONS_1_6_7.md
-├── tests/                     # Automated Pytest Suite (53 unit & integration tests)
+├── tests/                     # Automated Pytest Suite (54 unit & integration tests)
 ├── main.py                    # Unified CLI entrypoint
 ├── gui_main.py                # Graphical GUI launcher (Human vs AI & AI vs AI)
 ├── benchmark_cli.py           # Automated tournament CLI runner
+├── experiments_cli.py         # Scaling & failure-mode experimentation harness
 └── plotter_cli.py             # Publication figures generator CLI
 ```
 
 ### 7.2 Profiling Rigor & Non-Intrusive Instrumentation
 Measuring performance without distorting algorithm execution was a primary engineering objective:
 1. **Wall-Clock Latency**: Utilizes `time.perf_counter()`, offering microsecond precision that measures real elapsed processor and system time.
-2. **Memory Profiling**: Leverages Python's native `tracemalloc` library. By initiating `tracemalloc.start()` prior to search invocation and querying `tracemalloc.get_traced_memory()`, the harness isolates the peak heap memory specifically allocated by the search algorithm while filtering out static engine buffers.
-3. **Node Expansion Transparency**: Search algorithms interact with an optional `NodeCounter` callback or internal expansion accumulator. Node increments execute in $O(1)$ constant time, introducing negligible overhead ($< 0.5\%$).
+2. **Node Expansion Transparency**: Search algorithms interact with an optional `NodeCounter` callback or internal expansion accumulator. Node increments execute in $O(1)$ constant time, introducing negligible overhead ($< 0.5\%$).
 
 ### 7.3 Graphical Interface (Pygame) Engineering
 The graphical application (`Connect4Pygame`) was designed to provide an engaging, faculty-ready live demonstration interface:

@@ -1,110 +1,122 @@
-# ALGORITHMS.md: Member 1 (Algorithms & Core Logic)
+# ALGORITHMS.md: Algorithmic Architecture & Mathematical Foundations
 
-Explains the search code added in Week 2 so that anyone on the team can follow it.
-Files live in `connect4/agents/`, tests live in `tests/`.
+Explains the search algorithms, heuristics, and evaluation mechanics implemented across the Connect Four AI engine.
+Source files reside in `connect4/agents/`, tests reside in `tests/`.
 
-## 1. What was added
+## 1. Algorithmic Modules
 
-| File | What it does |
-|------|--------------|
-| `alphabeta_agent.py` | Minimax + Alpha-Beta pruning. Same scoring as `minimax_agent.py`, so node counts compare fairly. |
-| `heuristic.py` | Evaluation function used at the depth limit (center control, open threes/twos, opponent threats). |
-| `iterative_agent.py` | Iterative deepening on top of Alpha-Beta, with a time budget per move. |
-| `tests/test_alphabeta.py` | Same move as Minimax, fewer nodes, takes a win, blocks a loss. |
-| `tests/test_heuristic.py` | Heuristic checked on hand-made boards. |
-| `tests/test_iterative.py` | Time limit respected, board unchanged, takes an immediate win. |
+| File | Module Description |
+|------|--------------------|
+| `minimax_agent.py` | Vanilla depth-limited Minimax without pruning (state-space baseline). |
+| `alphabeta_agent.py` | Minimax with Alpha-Beta pruning, center-out move ordering, and heuristic toggle. |
+| `heuristic.py` | Evaluation function used at the depth limit (center control, open threes/twos, opponent threats across 69 windows). |
+| `iterative_agent.py` | Iterative deepening on top of Alpha-Beta, with per-node time budgeting and graceful fallback. |
+| `mcts_agent.py` | Monte Carlo Tree Search with UCT selection, random rollouts, and 1-ply tactical guards. |
+| `tests/test_alphabeta.py` | Alpha-Beta move parity with Minimax, node reduction checks, immediate win/block verification. |
+| `tests/test_heuristic.py` | 69-window heuristic evaluation verified against hand-crafted board states. |
+| `tests/test_iterative.py` | Time budget compliance, board state safety, and depth progression verification. |
+| `tests/test_mcts.py` | UCT child selection, rollout termination, and tactical guard checks. |
 
-## 2. Alpha-Beta pruning
+## 2. Minimax and Alpha-Beta Pruning
 
-### Theory
-Minimax looks at every move of both players down to the depth limit.
-Alpha-Beta keeps two numbers while searching:
-- `alpha`: best score the maximizing player (us) is already sure of
-- `beta`: best score the minimizing player (opponent) is already sure of
+### 2.1 Theoretical Formulation
+Minimax explores every possible legal game trajectory down to a fixed depth limit $d$. In a zero-sum game:
+- MAX (Player $+1$) chooses actions maximizing utility: $\max_{a \in \mathcal{A}(s)} V(s')$
+- MIN (Player $-1$) chooses actions minimizing utility: $\min_{a \in \mathcal{A}(s)} V(s')$
 
-If `value >= beta` in a max node, the opponent will never allow this branch, so the remaining moves are skipped.
-If `value <= alpha` in a min node, we already have something better elsewhere, so the remaining moves are skipped.
-The final move is the same as Minimax, only the number of nodes is smaller.
-Moves are tried center-first, because good moves first means more pruning.
+Alpha-Beta pruning tracks two scalar bounds during tree traversal:
+- $\alpha$: the highest utility guaranteed to the maximizing player along the current path.
+- $\beta$: the lowest utility guaranteed to the minimizing player along the current path.
 
-### Result (depth 4, one full game, Minimax vs Alpha-Beta)
+**Pruning Conditions:**
+- In a MAX node, if the return value satisfies $v \ge \beta$, the minimizing ancestor will never allow this branch, triggering an immediate cutoff.
+- In a MIN node, if the return value satisfies $v \le \alpha$, the maximizing ancestor already has a superior alternative, triggering an immediate cutoff.
 
-| | Plain Minimax | Alpha-Beta |
+Alpha-Beta is mathematically guaranteed to return the exact same minimax value as exhaustive search while evaluating significantly fewer states (Knuth & Moore, 1975).
+
+### 2.2 Move Ordering Optimization
+Pruning efficiency depends heavily on the sequence in which successor moves are evaluated. Under optimal ordering (best move evaluated first at every node), the effective branching factor drops from $b$ to $b^* = \sqrt{b}$.
+
+In our implementation, moves are evaluated center-out:
+$$\text{Column Priority} = [3, 2, 4, 1, 5, 0, 6]$$
+Central columns participate in far more potential winning lines (column 3 participates in 51 distinct 4-in-a-row windows), establishing tight $\alpha$-$\beta$ bounds early in the traversal.
+
+### 2.3 Measured Search Space Reduction (`docs/results/depth_scaling.csv`)
+In standardized depth-scaling benchmarks on an empty board:
+- At depth $d = 3$: Minimax expands 399 nodes vs. 75 nodes for Alpha-Beta (81.2% reduction).
+- At depth $d = 4$: Minimax expands 2,800 nodes vs. 172 nodes for Alpha-Beta (93.9% reduction).
+- At depth $d = 5$: Minimax expands 19,607 nodes (633.9 ms) vs. 563 nodes (28.3 ms) for Alpha-Beta (**97.1% reduction, ~22× faster**).
+- In a dense mid-game position at depth $d = 5$: Minimax expands 18,544 nodes vs. 1,624 nodes for Alpha-Beta (**91.2% reduction, ~10× faster**).
+
+*Note: Nodes count every recursive call. Minimax was evaluated up to depth 5 only.*
+
+---
+
+## 3. 69-Window Heuristic Evaluator (`heuristic.py`)
+
+When the search reaches depth limit $d = 0$ on a non-terminal state, utility is estimated using a precomputed evaluation matrix scanning all **69 winning 4-in-a-row windows**:
+- **24 horizontal** windows ($6 \text{ rows} \times 4 \text{ windows/row}$)
+- **21 vertical** windows ($7 \text{ columns} \times 3 \text{ windows/col}$)
+- **24 diagonal** windows (12 with positive slope, 12 with negative slope)
+
+### 3.1 Scoring Weights
+| Window Pattern | Utility Weight | Rationale |
 |---|---|---|
-| Total nodes | 17,134 | 1,726 |
-| Total time | 1907.86 ms | 245.33 ms |
+| Own disc in column 3 (Center) | $+3$ | Controls central columns with maximum connectivity (51 windows). |
+| Own 3 discs $+ 1$ empty cell | $+5$ | Immediate offensive threat (potential 1-ply win). |
+| Own 2 discs $+ 2$ empty cells | $+2$ | Emerging offensive alignment. |
+| Opponent 3 discs $+ 1$ empty cell | $-6$ | Critical defensive threat; weighted higher to prioritize blocking. |
+| Opponent 2 discs $+ 2$ empty cells | $-2$ | Emerging opponent alignment. |
+| Contested window (both players present) | $0$ | Window can never yield a 4-in-a-row victory. |
 
-About 9.9x fewer nodes and 7.8x less time.
+Terminal scores ($\pm 100{,}000 \pm \text{depth}$) strictly dominate any heuristic evaluation, ensuring the agent always prefers immediate forced victories and delays unavoidable losses.
 
-## 3. Heuristic evaluation (`heuristic.py`)
+---
 
-Used when the depth limit is reached and the game is not finished.
-It looks at all 69 windows of 4 cells (24 horizontal, 21 vertical, 24 diagonal).
+## 4. Iterative Deepening with Time Budget (`iterative_agent.py`)
 
-| Pattern | Score |
-|---------|-------|
-| Each own disc in the center column | +3 |
-| Window with 3 own discs and 1 empty | +5 |
-| Window with 2 own discs and 2 empty | +2 |
-| Window with 3 opponent discs and 1 empty | -6 |
-| Window with 2 opponent discs and 2 empty | -2 |
-| Window with both players' discs | 0 (can never become 4) |
+Iterative deepening runs successive depth-bounded Alpha-Beta searches at depths $d = 1, 2, 3, \dots$ until a wall-clock deadline expires.
+- **Anytime Property**: Always maintains a valid completed move from the last finished depth iteration.
+- **Move Ordering Re-use**: The best move identified at depth $d-1$ is evaluated first at depth $d$, accelerating pruning.
+- **State Integrity**: Deliberation executes on `board.copy()`; a timeout occurring mid-search safely unwinds without altering the live match state.
+- **Measured Depth Reach (`docs/results/iterative_depth.csv`)**:
+  - Empty board: reaches depth 5 at 0.05 s, depth 6 at 0.2 s, depth 7 at 0.5 s, and depth 8 at 1.0 s.
+  - Mid-game position: reaches depth 3 at 0.05 s, depth 5 at 0.2 s, depth 5 at 0.5 s, and depth 6 at 1.0 s.
 
-The opponent's three is weighted higher than our own three so the agent blocks threats early.
-All weights are constants at the top of the file, so they are easy to tune.
-Terminal scores (win = 100000, loss = -100000) are always far larger than any heuristic score.
+---
 
-## 4. Iterative deepening (`iterative_agent.py`)
+## 5. Monte Carlo Tree Search with UCT (`mcts_agent.py`)
 
-### Theory
-Search depth 1, then depth 2, then depth 3 and so on, until the time budget is over.
-The move from the last finished depth is played. This gives an answer at any time limit.
-Re-searching shallow depths looks wasteful, but the deepest level costs far more than all the shallow ones together.
-The best move of the previous depth is tried first at the next depth, which improves pruning.
-The search stops early if a forced win is found.
+MCTS constructs an asymmetric search tree guided by Monte Carlo simulations over four phases:
+1. **Selection**: Starting from root, traverses existing tree nodes using the Upper Confidence Bound for Trees (UCT) formula:
+   $$\text{UCT}(v_i) = \frac{Q(v_i)}{N(v_i)} + c \sqrt{\frac{2 \ln N(v)}{N(v_i)}}$$
+   - Exploitation term: empirical win rate $\frac{Q(v_i)}{N(v_i)}$.
+   - Exploration term: bonus scaled by relative visit frequencies.
+   - **Exploration Constant**: In our code, $c = 1.414$ multiplies $\sqrt{\frac{2 \ln N}{n_i}}$, meaning the effective exploration coefficient is $c \sqrt{2} \approx 1.414 \times 1.4142 \approx 2.0$ (approximately $1.4\times$ standard theoretical UCB1).
+2. **Expansion**: Instantiates a new child `MCTSNode` for an unvisited legal action.
+3. **Simulation (Rollout)**: Fast stochastic playout to terminal outcome (win, loss, or draw).
+4. **Backpropagation**: Playout reward propagated up the tree lineage, updating visit counts $N$ and value sums $Q$.
 
-### Details worth remembering
-- The clock is checked at every node. When time runs out a `TimeUp` exception stops the search.
-- The search runs on `board.copy()`, so a timeout in the middle cannot leave the real board changed.
-- `depth_reached` stores the last depth that finished in time.
+### 5.1 Tactical Guards
+MCTS features a 1-ply tactical check at the root:
+- If any legal move yields an immediate victory, that column is played immediately without simulation.
+- If the opponent possesses an immediate winning threat, MCTS forces a block.
+- Empirical validation (`docs/results/block_test.csv`): MCTS successfully blocks 20 of 20 times across budgets of 5, 20, 100, and 500 simulations.
 
-## 5. How to run
+---
 
-```
-python -m pytest tests/ -v
-python main.py --mode agent-vs-agent --agent1 minimax --agent2 alphabeta --depth1 4 --depth2 4
-python main.py --mode agent-vs-agent --agent1 alphabeta --agent2 iterative --depth1 4 --time2 1.0
-```
+## 6. Empirical Datasets (`docs/results/`)
 
-## 6. Results with heuristic and iterative deepening
+All experimental results cited across documentation are persisted in structured CSV files under `docs/results/`:
+1. `depth_scaling.csv`: Node expansions and single-run wall-clock timings across depths 1–9 on empty board and mid-game positions for Minimax (depths 1–5), Alpha-Beta, and Alpha-Beta + heuristic.
+2. `iterative_depth.csv`: Depth completed under time limits ($0.05\text{ s}, 0.2\text{ s}, 0.5\text{ s}, 1.0\text{ s}$) across positions.
+3. `mcts_vs_alphabeta.csv`: 10-game match outcomes (wins, draws, losses, average plies when lost) for MCTS budgets of 50, 200, 500, and 1000 simulations against Alpha-Beta ($d=4$).
+4. `block_test.csv`: Immediate tactical threat response rates across MCTS budgets.
+5. `tournament.csv`: 200-game round-robin tournament records (20 games per pair, alternating starting mover) across Random, Minimax ($d=3$), Alpha-Beta ($d=4$), Alpha-Beta ($d=6$), and MCTS ($N=500$).
 
-| Match | Agent 1 (X) | Agent 2 (O) | Winner | Turns | P1 Time (ms) | P1 Nodes | P2 Time (ms) | P2 Nodes |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| (a) Heuristic impact | AlphaBeta (d=4, center-only) | AlphaBeta (d=4, heuristic) | **Agent 2 (O)** | 34 | 167.06 | 1,766 | 402.53 | 2,441 |
-| (b) Iterative deepening | AlphaBeta (d=4, center-only) | Iterative (d=10, 1.0s budget) | **Agent 2 (O)** | 20 | 108.58 | 1,499 | 7119.36 | 60,920 |
-| (c) Baseline sanity check | Random | Iterative (d=10, 0.5s budget) | **Agent 2 (O)** | 8 | 0.13 | 4 | 1019.73 | 8,789 |
+---
 
-Enabling the 69-window heuristic evaluation allows Alpha-Beta to evaluate tactical disc alignments across all orientations, leading to a win over the center-only agent in 34 turns. With iterative deepening and a 1.0s per-move budget, the agent explores deeper plies (over 60,000 nodes total while adhering strictly to time constraints), decisively defeating the fixed depth-4 agent in 20 turns. Against random play, the iterative deepening agent rapidly spots winning patterns and seals victory in only 8 turns.
+## 7. Future Work & Board Representations
 
-## 7. Viva questions to be ready for
-
-- Why does `value >= beta` stop the loop in a max node?
-- Why is the result of Alpha-Beta the same as Minimax?
-- What is the best case and worst case of Alpha-Beta, and why does move ordering matter?
-- Why is the opponent's open three weighted -6 but our own +5?
-- Why does iterative deepening not waste time?
-- Why is the search run on a copy of the board?
-
-## 8. Week 3 additions (scaling and error analysis)
-
-Week 3 focused on systematic complexity profiling, failure-mode analysis, and head-to-head benchmarking between heuristic Alpha-Beta search and statistical Monte Carlo Tree Search:
-
-- **Experimentation Harness (`experiments_cli.py`):**
-  A dedicated testing harness to run automated depth-scaling benchmarks (depths 3 to 9), iterative deepening deadline rollbacks, one-move tactical block tests, and MCTS simulation budget sweeps (50, 200, 500, 1000 rollouts).
-- **Empirical Datasets (`docs/results/`):**
-  Outputs are persisted as structured CSVs: `depth_scaling.csv`, `iterative_scaling.csv`, `mcts_budget_scaling.csv`, and `ordering_comparison.csv`.
-- **Academic Milestone Report (`docs/STAGE3_REPORT_SECTIONS_2_3_4_5_8.md`):**
-  Contains formal mathematical specifications, depth-growth measurements, effective branching factor calculations ($b^* \approx N^{1/d}$ between 3.4 and 4.4), empirical throughput, and comprehensive error analysis covering tactical horizon effects, single-move guards, and budget sensitivity.
-- **Viva Defense Slides (`docs/SLIDES_MEMBER1.md`):**
-  Slide-by-slide presentation outline and speaker notes covering problem formulation, search algorithms, heuristic design, empirical complexity, and comparative failure modes.
-
+- **Bitboard Optimization**: The current board representation utilizes a 2D contiguous NumPy `int8` array. Implementing 64-bit binary bitboards (two `uint64` masks for Player 1 and Player 2) would enable bitwise gravity shifts and $O(1)$ four-in-a-row alignment detection, significantly increasing simulation throughput per second.
+- **Transposition Tables**: Integrating Zobrist hashing with an LRU cache to store previously evaluated bounds and avoid re-searching transposed board permutations.

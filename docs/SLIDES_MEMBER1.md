@@ -84,7 +84,7 @@ Numbers come from `docs/results/` and Sections 4, 5 and 8 of the report. Two fix
 | Empty | 5 | 19,607 | 563 | 97.1% |
 | Mid-game | 5 | 18,544 | 1,624 | 91.2% |
 - Pruning grows with depth and is lower in tactical positions
-- Add chart: docs/figures/fig5_depth_scaling.png
+- Add chart: docs/figures/fig1_execution_time_vs_depth.png or docs/figures/fig2_nodes_expanded_log_scale.png
 
 ## Slide 10: Effective branching factor and the depth cliff
 - Minimax: b* about 7.2 (matches 7^d)
