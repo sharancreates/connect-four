@@ -52,11 +52,11 @@ DEFAULT_TOURNAMENT_WINRATES = {
     ],
     # Row agent win percentage against Column agent (50% on diagonal)
     "matrix": [
-        [50.0, 10.0,  0.0,  0.0,  5.0],  # Random
-        [90.0, 50.0, 25.0, 10.0, 30.0],  # Minimax (d=3)
-        [100.0, 75.0, 50.0, 35.0, 55.0], # AlphaBeta (d=4)
-        [100.0, 90.0, 65.0, 50.0, 70.0], # AlphaBeta (d=6)
-        [95.0, 70.0, 45.0, 30.0, 50.0],  # MCTS (N=500)
+        [50.0, 0.0, 0.0, 0.0, 0.0],  # Random
+        [100.0, 50.0, 0.0, 0.0, 25.0],  # Minimax (d=3)
+        [100.0, 50.0, 50.0, 0.0, 50.0], # AlphaBeta (d=4)
+        [100.0, 50.0, 0.0, 50.0, 60.0], # AlphaBeta (d=6)
+        [100.0, 75.0, 45.0, 40.0, 50.0],  # MCTS (N=500)
     ],
 }
 

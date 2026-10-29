@@ -1,0 +1,201 @@
+agents,first_mover,winner,plies
+Random vs Minimax (d=3),Random,Minimax (d=3),8
+Random vs Minimax (d=3),Minimax (d=3),Minimax (d=3),7
+Random vs Minimax (d=3),Random,Minimax (d=3),8
+Random vs Minimax (d=3),Minimax (d=3),Minimax (d=3),7
+Random vs Minimax (d=3),Random,Minimax (d=3),10
+Random vs Minimax (d=3),Minimax (d=3),Minimax (d=3),7
+Random vs Minimax (d=3),Random,Minimax (d=3),8
+Random vs Minimax (d=3),Minimax (d=3),Minimax (d=3),7
+Random vs Minimax (d=3),Random,Minimax (d=3),18
+Random vs Minimax (d=3),Minimax (d=3),Minimax (d=3),9
+Random vs Minimax (d=3),Random,Minimax (d=3),8
+Random vs Minimax (d=3),Minimax (d=3),Minimax (d=3),25
+Random vs Minimax (d=3),Random,Minimax (d=3),8
+Random vs Minimax (d=3),Minimax (d=3),Minimax (d=3),7
+Random vs Minimax (d=3),Random,Minimax (d=3),8
+Random vs Minimax (d=3),Minimax (d=3),Minimax (d=3),7
+Random vs Minimax (d=3),Random,Minimax (d=3),8
+Random vs Minimax (d=3),Minimax (d=3),Minimax (d=3),7
+Random vs Minimax (d=3),Random,Minimax (d=3),30
+Random vs Minimax (d=3),Minimax (d=3),Minimax (d=3),15
+Random vs AlphaBeta (d=4),Random,AlphaBeta (d=4),8
+Random vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),17
+Random vs AlphaBeta (d=4),Random,AlphaBeta (d=4),8
+Random vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),7
+Random vs AlphaBeta (d=4),Random,AlphaBeta (d=4),8
+Random vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),9
+Random vs AlphaBeta (d=4),Random,AlphaBeta (d=4),8
+Random vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),17
+Random vs AlphaBeta (d=4),Random,AlphaBeta (d=4),20
+Random vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),7
+Random vs AlphaBeta (d=4),Random,AlphaBeta (d=4),8
+Random vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),7
+Random vs AlphaBeta (d=4),Random,AlphaBeta (d=4),8
+Random vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),7
+Random vs AlphaBeta (d=4),Random,AlphaBeta (d=4),8
+Random vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),7
+Random vs AlphaBeta (d=4),Random,AlphaBeta (d=4),8
+Random vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),7
+Random vs AlphaBeta (d=4),Random,AlphaBeta (d=4),8
+Random vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),7
+Random vs AlphaBeta (d=6),Random,AlphaBeta (d=6),20
+Random vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),7
+Random vs AlphaBeta (d=6),Random,AlphaBeta (d=6),8
+Random vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),9
+Random vs AlphaBeta (d=6),Random,AlphaBeta (d=6),18
+Random vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),11
+Random vs AlphaBeta (d=6),Random,AlphaBeta (d=6),8
+Random vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),7
+Random vs AlphaBeta (d=6),Random,AlphaBeta (d=6),8
+Random vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),7
+Random vs AlphaBeta (d=6),Random,AlphaBeta (d=6),10
+Random vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),7
+Random vs AlphaBeta (d=6),Random,AlphaBeta (d=6),8
+Random vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),7
+Random vs AlphaBeta (d=6),Random,AlphaBeta (d=6),8
+Random vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),7
+Random vs AlphaBeta (d=6),Random,AlphaBeta (d=6),8
+Random vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),21
+Random vs AlphaBeta (d=6),Random,AlphaBeta (d=6),8
+Random vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),7
+Random vs MCTS (N=500),Random,MCTS (N=500),8
+Random vs MCTS (N=500),MCTS (N=500),MCTS (N=500),7
+Random vs MCTS (N=500),Random,MCTS (N=500),8
+Random vs MCTS (N=500),MCTS (N=500),MCTS (N=500),13
+Random vs MCTS (N=500),Random,MCTS (N=500),12
+Random vs MCTS (N=500),MCTS (N=500),MCTS (N=500),7
+Random vs MCTS (N=500),Random,MCTS (N=500),8
+Random vs MCTS (N=500),MCTS (N=500),MCTS (N=500),7
+Random vs MCTS (N=500),Random,MCTS (N=500),8
+Random vs MCTS (N=500),MCTS (N=500),MCTS (N=500),11
+Random vs MCTS (N=500),Random,MCTS (N=500),14
+Random vs MCTS (N=500),MCTS (N=500),MCTS (N=500),7
+Random vs MCTS (N=500),Random,MCTS (N=500),10
+Random vs MCTS (N=500),MCTS (N=500),MCTS (N=500),7
+Random vs MCTS (N=500),Random,MCTS (N=500),16
+Random vs MCTS (N=500),MCTS (N=500),MCTS (N=500),11
+Random vs MCTS (N=500),Random,MCTS (N=500),14
+Random vs MCTS (N=500),MCTS (N=500),MCTS (N=500),7
+Random vs MCTS (N=500),Random,MCTS (N=500),10
+Random vs MCTS (N=500),MCTS (N=500),MCTS (N=500),7
+Minimax (d=3) vs AlphaBeta (d=4),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),11
+Minimax (d=3) vs AlphaBeta (d=4),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),11
+Minimax (d=3) vs AlphaBeta (d=4),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),11
+Minimax (d=3) vs AlphaBeta (d=4),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),11
+Minimax (d=3) vs AlphaBeta (d=4),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),11
+Minimax (d=3) vs AlphaBeta (d=4),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),11
+Minimax (d=3) vs AlphaBeta (d=4),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),11
+Minimax (d=3) vs AlphaBeta (d=4),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),11
+Minimax (d=3) vs AlphaBeta (d=4),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),11
+Minimax (d=3) vs AlphaBeta (d=4),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=4),AlphaBeta (d=4),AlphaBeta (d=4),11
+Minimax (d=3) vs AlphaBeta (d=6),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),11
+Minimax (d=3) vs AlphaBeta (d=6),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),11
+Minimax (d=3) vs AlphaBeta (d=6),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),11
+Minimax (d=3) vs AlphaBeta (d=6),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),11
+Minimax (d=3) vs AlphaBeta (d=6),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),11
+Minimax (d=3) vs AlphaBeta (d=6),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),11
+Minimax (d=3) vs AlphaBeta (d=6),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),11
+Minimax (d=3) vs AlphaBeta (d=6),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),11
+Minimax (d=3) vs AlphaBeta (d=6),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),11
+Minimax (d=3) vs AlphaBeta (d=6),Minimax (d=3),Draw,42
+Minimax (d=3) vs AlphaBeta (d=6),AlphaBeta (d=6),AlphaBeta (d=6),11
+Minimax (d=3) vs MCTS (N=500),Minimax (d=3),MCTS (N=500),34
+Minimax (d=3) vs MCTS (N=500),MCTS (N=500),MCTS (N=500),7
+Minimax (d=3) vs MCTS (N=500),Minimax (d=3),MCTS (N=500),26
+Minimax (d=3) vs MCTS (N=500),MCTS (N=500),MCTS (N=500),7
+Minimax (d=3) vs MCTS (N=500),Minimax (d=3),MCTS (N=500),32
+Minimax (d=3) vs MCTS (N=500),MCTS (N=500),Minimax (d=3),36
+Minimax (d=3) vs MCTS (N=500),Minimax (d=3),Minimax (d=3),23
+Minimax (d=3) vs MCTS (N=500),MCTS (N=500),MCTS (N=500),17
+Minimax (d=3) vs MCTS (N=500),Minimax (d=3),MCTS (N=500),32
+Minimax (d=3) vs MCTS (N=500),MCTS (N=500),Minimax (d=3),34
+Minimax (d=3) vs MCTS (N=500),Minimax (d=3),MCTS (N=500),32
+Minimax (d=3) vs MCTS (N=500),MCTS (N=500),MCTS (N=500),7
+Minimax (d=3) vs MCTS (N=500),Minimax (d=3),MCTS (N=500),34
+Minimax (d=3) vs MCTS (N=500),MCTS (N=500),Minimax (d=3),40
+Minimax (d=3) vs MCTS (N=500),Minimax (d=3),MCTS (N=500),38
+Minimax (d=3) vs MCTS (N=500),MCTS (N=500),MCTS (N=500),23
+Minimax (d=3) vs MCTS (N=500),Minimax (d=3),MCTS (N=500),34
+Minimax (d=3) vs MCTS (N=500),MCTS (N=500),MCTS (N=500),7
+Minimax (d=3) vs MCTS (N=500),Minimax (d=3),MCTS (N=500),32
+Minimax (d=3) vs MCTS (N=500),MCTS (N=500),Minimax (d=3),24
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=4),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=6),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=4),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=6),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=4),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=6),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=4),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=6),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=4),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=6),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=4),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=6),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=4),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=6),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=4),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=6),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=4),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=6),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=4),Draw,42
+AlphaBeta (d=4) vs AlphaBeta (d=6),AlphaBeta (d=6),Draw,42
+AlphaBeta (d=4) vs MCTS (N=500),AlphaBeta (d=4),MCTS (N=500),34
+AlphaBeta (d=4) vs MCTS (N=500),MCTS (N=500),MCTS (N=500),39
+AlphaBeta (d=4) vs MCTS (N=500),AlphaBeta (d=4),MCTS (N=500),34
+AlphaBeta (d=4) vs MCTS (N=500),MCTS (N=500),AlphaBeta (d=4),24
+AlphaBeta (d=4) vs MCTS (N=500),AlphaBeta (d=4),MCTS (N=500),32
+AlphaBeta (d=4) vs MCTS (N=500),MCTS (N=500),AlphaBeta (d=4),22
+AlphaBeta (d=4) vs MCTS (N=500),AlphaBeta (d=4),AlphaBeta (d=4),37
+AlphaBeta (d=4) vs MCTS (N=500),MCTS (N=500),MCTS (N=500),17
+AlphaBeta (d=4) vs MCTS (N=500),AlphaBeta (d=4),Draw,42
+AlphaBeta (d=4) vs MCTS (N=500),MCTS (N=500),AlphaBeta (d=4),30
+AlphaBeta (d=4) vs MCTS (N=500),AlphaBeta (d=4),MCTS (N=500),34
+AlphaBeta (d=4) vs MCTS (N=500),MCTS (N=500),AlphaBeta (d=4),34
+AlphaBeta (d=4) vs MCTS (N=500),AlphaBeta (d=4),MCTS (N=500),34
+AlphaBeta (d=4) vs MCTS (N=500),MCTS (N=500),MCTS (N=500),21
+AlphaBeta (d=4) vs MCTS (N=500),AlphaBeta (d=4),AlphaBeta (d=4),37
+AlphaBeta (d=4) vs MCTS (N=500),MCTS (N=500),AlphaBeta (d=4),40
+AlphaBeta (d=4) vs MCTS (N=500),AlphaBeta (d=4),AlphaBeta (d=4),39
+AlphaBeta (d=4) vs MCTS (N=500),MCTS (N=500),AlphaBeta (d=4),28
+AlphaBeta (d=4) vs MCTS (N=500),AlphaBeta (d=4),MCTS (N=500),34
+AlphaBeta (d=4) vs MCTS (N=500),MCTS (N=500),AlphaBeta (d=4),32
+AlphaBeta (d=6) vs MCTS (N=500),AlphaBeta (d=6),MCTS (N=500),34
+AlphaBeta (d=6) vs MCTS (N=500),MCTS (N=500),AlphaBeta (d=6),36
+AlphaBeta (d=6) vs MCTS (N=500),AlphaBeta (d=6),MCTS (N=500),34
+AlphaBeta (d=6) vs MCTS (N=500),MCTS (N=500),MCTS (N=500),39
+AlphaBeta (d=6) vs MCTS (N=500),AlphaBeta (d=6),AlphaBeta (d=6),41
+AlphaBeta (d=6) vs MCTS (N=500),MCTS (N=500),AlphaBeta (d=6),38
+AlphaBeta (d=6) vs MCTS (N=500),AlphaBeta (d=6),MCTS (N=500),34
+AlphaBeta (d=6) vs MCTS (N=500),MCTS (N=500),MCTS (N=500),33
+AlphaBeta (d=6) vs MCTS (N=500),AlphaBeta (d=6),AlphaBeta (d=6),31
+AlphaBeta (d=6) vs MCTS (N=500),MCTS (N=500),AlphaBeta (d=6),34
+AlphaBeta (d=6) vs MCTS (N=500),AlphaBeta (d=6),MCTS (N=500),38
+AlphaBeta (d=6) vs MCTS (N=500),MCTS (N=500),AlphaBeta (d=6),42
+AlphaBeta (d=6) vs MCTS (N=500),AlphaBeta (d=6),MCTS (N=500),38
+AlphaBeta (d=6) vs MCTS (N=500),MCTS (N=500),AlphaBeta (d=6),28
+AlphaBeta (d=6) vs MCTS (N=500),AlphaBeta (d=6),AlphaBeta (d=6),33
+AlphaBeta (d=6) vs MCTS (N=500),MCTS (N=500),AlphaBeta (d=6),32
+AlphaBeta (d=6) vs MCTS (N=500),AlphaBeta (d=6),MCTS (N=500),34
+AlphaBeta (d=6) vs MCTS (N=500),MCTS (N=500),AlphaBeta (d=6),42
+AlphaBeta (d=6) vs MCTS (N=500),AlphaBeta (d=6),AlphaBeta (d=6),37
+AlphaBeta (d=6) vs MCTS (N=500),MCTS (N=500),AlphaBeta (d=6),34
