@@ -11,7 +11,8 @@ from connect4.benchmark.plotter import (
     plot_execution_time_vs_depth,
     plot_nodes_expanded_log_scale,
     plot_winrate_matrix_heatmap,
-    plot_memory_footprint,
+    plot_mcts_vs_alphabeta,
+    plot_mcts_strength,
     generate_all_figures,
 )
 
@@ -25,6 +26,7 @@ __all__ = [
     "plot_execution_time_vs_depth",
     "plot_nodes_expanded_log_scale",
     "plot_winrate_matrix_heatmap",
-    "plot_memory_footprint",
+    "plot_mcts_vs_alphabeta",
+    "plot_mcts_strength",
     "generate_all_figures",
 ]

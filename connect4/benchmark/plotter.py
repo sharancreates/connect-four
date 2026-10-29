@@ -1,11 +1,13 @@
 """Comparative Visualization and Plotting Module for Connect Four AI Benchmark.
 
 Generates publication-quality figures comparing Minimax, Alpha-Beta pruning,
-Iterative Deepening, and Monte Carlo Tree Search across execution time,
-nodes expanded (log-scale), tournament win-rate matrix, and peak memory footprint.
+and Monte Carlo Tree Search across execution time, nodes expanded (log-scale),
+tournament win-rate matrix, and MCTS simulation budget scaling.
+All figures are constructed strictly from empirical benchmark CSV results.
 """
 
 from __future__ import annotations
+import csv
 import os
 from typing import Dict, List, Optional, Tuple, Any
 import numpy as np
@@ -15,62 +17,13 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-
 # Palette definition
-COLOR_MINIMAX = "#ef4444"      # Crimson Red
-COLOR_ALPHABETA = "#3b82f6"    # Royal Blue
-COLOR_ALPHABETA_NO = "#f97316" # Orange
-COLOR_MCTS = "#10b981"         # Emerald Green
-COLOR_ITERATIVE = "#8b5cf6"    # Purple
-COLOR_RANDOM = "#64748b"       # Slate Gray
-
-
-# Empirical baseline metrics gathered across tournament benchmarks
-DEFAULT_DEPTH_METRICS = {
-    "depths": [1, 2, 3, 4, 5, 6],
-    "minimax_time_ms": [0.35, 1.82, 11.45, 78.90, 520.10, 3750.00],
-    "minimax_nodes": [7, 49, 343, 2401, 16807, 117649],
-    "alphabeta_time_ms": [0.31, 0.95, 3.20, 12.80, 48.60, 195.40],
-    "alphabeta_nodes": [7, 24, 82, 312, 1150, 4210],
-    "alphabeta_center_time_ms": [0.28, 0.72, 2.10, 7.40, 24.10, 88.50],
-    "alphabeta_center_nodes": [7, 18, 51, 174, 582, 1890],
-}
-
-DEFAULT_MCTS_BUDGET_METRICS = {
-    "simulations": [100, 200, 400, 800, 1200],
-    "time_ms": [28.4, 56.1, 112.5, 226.0, 341.2],
-    "nodes_stored": [85, 172, 345, 689, 1032],
-}
-
-DEFAULT_TOURNAMENT_WINRATES = {
-    "agents": [
-        "Random",
-        "Minimax (d=3)",
-        "AlphaBeta (d=4)",
-        "AlphaBeta (d=6)",
-        "MCTS (N=500)",
-    ],
-    # Row agent win percentage against Column agent (50% on diagonal)
-    "matrix": [
-        [50.0, 0.0, 0.0, 0.0, 0.0],  # Random
-        [100.0, 50.0, 0.0, 0.0, 25.0],  # Minimax (d=3)
-        [100.0, 50.0, 50.0, 0.0, 50.0], # AlphaBeta (d=4)
-        [100.0, 50.0, 0.0, 50.0, 60.0], # AlphaBeta (d=6)
-        [100.0, 75.0, 45.0, 40.0, 50.0],  # MCTS (N=500)
-    ],
-}
-
-DEFAULT_MEMORY_METRICS = {
-    "agents": [
-        "Random",
-        "Minimax (d=4)",
-        "AlphaBeta (d=6)",
-        "Iterative (200ms)",
-        "MCTS (N=500)",
-        "MCTS (N=1000)",
-    ],
-    "peak_memory_kb": [18.4, 42.1, 48.6, 52.3, 312.8, 624.5],
-}
+COLOR_MINIMAX = "#ef4444"              # Crimson Red
+COLOR_ALPHABETA = "#3b82f6"            # Royal Blue
+COLOR_ALPHABETA_HEURISTIC = "#f97316"  # Orange
+COLOR_MCTS = "#10b981"                 # Emerald Green
+COLOR_ITERATIVE = "#8b5cf6"            # Purple
+COLOR_RANDOM = "#64748b"               # Slate Gray
 
 
 def _setup_style() -> None:
@@ -87,78 +40,75 @@ def _setup_style() -> None:
 
 
 def plot_execution_time_vs_depth(
-    data: Optional[Dict[str, Any]] = None,
+    csv_path: str = "docs/results/depth_scaling.csv",
     output_path: str = "docs/figures/fig1_execution_time_vs_depth.png",
 ) -> str:
-    """Plot search latency comparison as depth increases.
+    """Plot search latency comparison as depth increases from depth_scaling.csv.
 
-    Figure 1: Wall-Clock Decision Time (Latency) vs. Search Depth.
+    Figure 1: Mean Move Latency vs. Search Depth.
+    Two panels: 'Empty Board' and 'Mid-Game Position'.
+    Lines for minimax, alphabeta, alphabeta+heuristic.
+    Minimax stops at depth 5; does not extrapolate.
     """
+    if not os.path.exists(csv_path):
+        raise FileNotFoundError(f"Missing required CSV file: {csv_path}")
+
     _setup_style()
-    metrics = data or DEFAULT_DEPTH_METRICS
-    depths = metrics["depths"]
+
+    data: Dict[str, Dict[str, List[Tuple[int, float]]]] = {
+        "empty": {"minimax": [], "alphabeta": [], "alphabeta+heuristic": []},
+        "mid-game": {"minimax": [], "alphabeta": [], "alphabeta+heuristic": []},
+    }
+
+    with open(csv_path, mode="r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            pos = row["position"].strip()
+            agent = row["agent"].strip()
+            depth = int(row["depth"])
+            time_ms = float(row["time_ms"])
+            if pos in data and agent in data[pos]:
+                if agent == "minimax" and depth > 5:
+                    continue  # Minimax stops at depth 5; do not extrapolate
+                data[pos][agent].append((depth, time_ms))
+
+    for pos in data:
+        for agent in data[pos]:
+            data[pos][agent].sort(key=lambda x: x[0])
 
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
-    fig, ax = plt.subplots(figsize=(8.5, 5.2), dpi=300)
+    fig, (ax_empty, ax_mid) = plt.subplots(1, 2, figsize=(13, 5.5), dpi=300)
 
-    # Plot Minimax
-    ax.plot(
-        depths,
-        metrics["minimax_time_ms"],
-        marker="o",
-        linewidth=2.4,
-        markersize=6,
-        color=COLOR_MINIMAX,
-        label="Vanilla Minimax (Brute Force)",
-    )
+    agent_configs = [
+        ("minimax", "Vanilla Minimax", COLOR_MINIMAX, "o", 2.2),
+        ("alphabeta", "Alpha-Beta", COLOR_ALPHABETA, "s", 2.2),
+        ("alphabeta+heuristic", "Alpha-Beta + Heuristic", COLOR_ALPHABETA_HEURISTIC, "^", 2.2),
+    ]
 
-    # Plot Alpha-Beta Basic
-    ax.plot(
-        depths,
-        metrics["alphabeta_time_ms"],
-        marker="s",
-        linewidth=2.2,
-        markersize=6,
-        color=COLOR_ALPHABETA_NO,
-        label="Alpha-Beta (Default Order)",
-    )
+    for ax, pos_key, panel_title in [
+        (ax_empty, "empty", "Position: Empty Board"),
+        (ax_mid, "mid-game", "Position: Mid-Game"),
+    ]:
+        for agent_key, label, color, marker, lw in agent_configs:
+            pts = data[pos_key].get(agent_key, [])
+            if pts:
+                xs = [p[0] for p in pts]
+                ys = [p[1] for p in pts]
+                ax.plot(xs, ys, label=label, color=color, marker=marker, linewidth=lw, markersize=6)
 
-    # Plot Alpha-Beta Center-Out Ordering
-    ax.plot(
-        depths,
-        metrics["alphabeta_center_time_ms"],
-        marker="^",
-        linewidth=2.5,
-        markersize=7,
-        color=COLOR_ALPHABETA,
-        label="Alpha-Beta + Center Ordering",
-    )
+        ax.set_title(panel_title, fontsize=12, fontweight="bold", pad=10, color="#0f172a")
+        ax.set_xlabel("Search Depth (plies)", fontsize=11, fontweight="semibold", color="#1e293b")
+        ax.set_ylabel("Execution Time (ms)", fontsize=11, fontweight="semibold", color="#1e293b")
+        ax.grid(True)
+        ax.legend(frameon=True, facecolor="#f8fafc", edgecolor="#cbd5e1", fontsize=9.5)
 
-    ax.set_title(
-        "Figure 1: Mean Move Latency vs. Search Depth (Adani University AI Lab)",
-        fontsize=13,
+    fig.suptitle(
+        "Figure 1: Mean Move Latency vs. Search Depth",
+        fontsize=14,
         fontweight="bold",
-        pad=14,
+        y=0.98,
         color="#0f172a",
     )
-    ax.set_xlabel("Search Depth ($d$ Plies)", fontsize=11, fontweight="semibold", color="#1e293b")
-    ax.set_ylabel("Execution Time (ms per move)", fontsize=11, fontweight="semibold", color="#1e293b")
-    ax.set_xticks(depths)
-    ax.grid(True)
-    ax.legend(frameon=True, facecolor="#f8fafc", edgecolor="#cbd5e1", fontsize=9.5)
-
-    # Annotate speedup at depth 6
-    speedup = metrics["minimax_time_ms"][-1] / metrics["alphabeta_center_time_ms"][-1]
-    ax.annotate(
-        f"{speedup:.1f}x Speedup\n(Depth 6)",
-        xy=(depths[-1], metrics["alphabeta_center_time_ms"][-1]),
-        xytext=(depths[-1] - 1.2, metrics["alphabeta_center_time_ms"][-1] + 600),
-        arrowprops=dict(facecolor="#1e293b", arrowstyle="->", lw=1.2),
-        fontsize=9,
-        fontweight="bold",
-        bbox=dict(boxstyle="round,pad=0.4", facecolor="#dbeafe", edgecolor="#93c5fd"),
-    )
-
     plt.tight_layout()
     fig.savefig(output_path, dpi=300)
     plt.close(fig)
@@ -166,77 +116,76 @@ def plot_execution_time_vs_depth(
 
 
 def plot_nodes_expanded_log_scale(
-    data: Optional[Dict[str, Any]] = None,
+    csv_path: str = "docs/results/depth_scaling.csv",
     output_path: str = "docs/figures/fig2_nodes_expanded_log_scale.png",
 ) -> str:
-    """Plot nodes / simulations expanded on logarithmic scale.
+    """Plot search space expansion on logarithmic scale from depth_scaling.csv.
 
     Figure 2: Search Tree Node Expansions (Logarithmic Scale) vs. Depth.
+    Two panels: 'Empty Board' and 'Mid-Game Position'.
+    Lines for minimax, alphabeta, alphabeta+heuristic.
+    Minimax stops at depth 5; does not extrapolate.
     """
+    if not os.path.exists(csv_path):
+        raise FileNotFoundError(f"Missing required CSV file: {csv_path}")
+
     _setup_style()
-    metrics = data or DEFAULT_DEPTH_METRICS
-    depths = metrics["depths"]
+
+    data: Dict[str, Dict[str, List[Tuple[int, int]]]] = {
+        "empty": {"minimax": [], "alphabeta": [], "alphabeta+heuristic": []},
+        "mid-game": {"minimax": [], "alphabeta": [], "alphabeta+heuristic": []},
+    }
+
+    with open(csv_path, mode="r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            pos = row["position"].strip()
+            agent = row["agent"].strip()
+            depth = int(row["depth"])
+            nodes = int(row["nodes"])
+            if pos in data and agent in data[pos]:
+                if agent == "minimax" and depth > 5:
+                    continue  # Minimax stops at depth 5; do not extrapolate
+                data[pos][agent].append((depth, nodes))
+
+    for pos in data:
+        for agent in data[pos]:
+            data[pos][agent].sort(key=lambda x: x[0])
 
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
-    fig, ax = plt.subplots(figsize=(8.5, 5.2), dpi=300)
+    fig, (ax_empty, ax_mid) = plt.subplots(1, 2, figsize=(13, 5.5), dpi=300)
 
-    # Semi-log plotting
-    ax.semilogy(
-        depths,
-        metrics["minimax_nodes"],
-        marker="o",
-        linewidth=2.4,
-        markersize=6,
-        color=COLOR_MINIMAX,
-        label=r"Vanilla Minimax ($O(b^d)$ Exponential Explosion)",
-    )
+    agent_configs = [
+        ("minimax", "Vanilla Minimax", COLOR_MINIMAX, "o", 2.2),
+        ("alphabeta", "Alpha-Beta", COLOR_ALPHABETA, "s", 2.2),
+        ("alphabeta+heuristic", "Alpha-Beta + Heuristic", COLOR_ALPHABETA_HEURISTIC, "^", 2.2),
+    ]
 
-    ax.semilogy(
-        depths,
-        metrics["alphabeta_nodes"],
-        marker="s",
-        linewidth=2.2,
-        markersize=6,
-        color=COLOR_ALPHABETA_NO,
-        label="Alpha-Beta (Default Move Ordering)",
-    )
+    for ax, pos_key, panel_title in [
+        (ax_empty, "empty", "Position: Empty Board"),
+        (ax_mid, "mid-game", "Position: Mid-Game"),
+    ]:
+        for agent_key, label, color, marker, lw in agent_configs:
+            pts = data[pos_key].get(agent_key, [])
+            if pts:
+                xs = [p[0] for p in pts]
+                ys = [p[1] for p in pts]
+                ax.semilogy(xs, ys, label=label, color=color, marker=marker, linewidth=lw, markersize=6)
 
-    ax.semilogy(
-        depths,
-        metrics["alphabeta_center_nodes"],
-        marker="^",
-        linewidth=2.5,
-        markersize=7,
-        color=COLOR_ALPHABETA,
-        label=r"Alpha-Beta + Center-Out Ordering ($O(b^{d/2})$ Optimal)",
-    )
+        ax.set_title(panel_title, fontsize=12, fontweight="bold", pad=10, color="#0f172a")
+        ax.set_xlabel("Search Depth (plies)", fontsize=11, fontweight="semibold", color="#1e293b")
+        ax.set_ylabel(r"Nodes Expanded ($\log_{10}$ Scale)", fontsize=11, fontweight="semibold", color="#1e293b")
+        ax.grid(True, which="both", axis="y")
+        ax.grid(True, which="major", axis="x")
+        ax.legend(frameon=True, facecolor="#f8fafc", edgecolor="#cbd5e1", fontsize=9.5)
 
-    ax.set_title(
-        "Figure 2: Search Space Expansion vs. Depth [Logarithmic Scale]",
-        fontsize=13,
+    fig.suptitle(
+        "Figure 2: Search Tree Node Expansions vs. Depth (Logarithmic Scale)",
+        fontsize=14,
         fontweight="bold",
-        pad=14,
+        y=0.98,
         color="#0f172a",
     )
-    ax.set_xlabel("Search Depth ($d$ Plies)", fontsize=11, fontweight="semibold", color="#1e293b")
-    ax.set_ylabel(r"Nodes Expanded ($\log_{10}$ Scale)", fontsize=11, fontweight="semibold", color="#1e293b")
-    ax.set_xticks(depths)
-    ax.grid(True, which="both", axis="y")
-    ax.grid(True, which="major", axis="x")
-    ax.legend(frameon=True, facecolor="#f8fafc", edgecolor="#cbd5e1", fontsize=9.5)
-
-    # Annotate pruning ratio at depth 6
-    pruned_pct = (1.0 - (metrics["alphabeta_center_nodes"][-1] / metrics["minimax_nodes"][-1])) * 100
-    ax.annotate(
-        f"{pruned_pct:.2f}% Branches Pruned\n(1,890 vs 117,649 nodes)",
-        xy=(depths[-1], metrics["alphabeta_center_nodes"][-1]),
-        xytext=(depths[-1] - 1.8, 400),
-        arrowprops=dict(facecolor="#1e293b", arrowstyle="->", lw=1.2),
-        fontsize=9,
-        fontweight="bold",
-        bbox=dict(boxstyle="round,pad=0.4", facecolor="#dcfce7", edgecolor="#86efac"),
-    )
-
     plt.tight_layout()
     fig.savefig(output_path, dpi=300)
     plt.close(fig)
@@ -244,50 +193,103 @@ def plot_nodes_expanded_log_scale(
 
 
 def plot_winrate_matrix_heatmap(
-    data: Optional[Dict[str, Any]] = None,
+    csv_path: str = "docs/results/tournament.csv",
     output_path: str = "docs/figures/fig3_tournament_winrate_heatmap.png",
 ) -> str:
-    """Plot head-to-head tournament win-rate matrix heatmap.
+    """Plot head-to-head tournament win-rate matrix heatmap from tournament.csv.
 
-    Figure 3: Head-to-Head Tournament Win-Rate Matrix Heatmap.
+    Figure 3: Round-robin results (20 games per pair).
+    Computes score = (wins + 0.5*draws)/games for row agent.
+    Prints W-D-L in each cell.
     """
+    if not os.path.exists(csv_path):
+        raise FileNotFoundError(f"Missing required CSV file: {csv_path}")
+
     _setup_style()
-    metrics = data or DEFAULT_TOURNAMENT_WINRATES
-    agents = metrics["agents"]
-    matrix = np.array(metrics["matrix"], dtype=float)
+
+    with open(csv_path, mode="r", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+
+    # Canonical agent ordering
+    canonical_agents = [
+        "Random",
+        "Minimax (d=3)",
+        "AlphaBeta (d=4)",
+        "AlphaBeta (d=6)",
+        "MCTS (N=500)",
+    ]
+
+    # Discover agents from tournament CSV
+    present_agents: List[str] = []
+    for r in rows:
+        pair = r["agents"].split(" vs ")
+        for p in pair:
+            p_clean = p.strip()
+            if p_clean not in present_agents:
+                present_agents.append(p_clean)
+
+    agents = [a for a in canonical_agents if a in present_agents]
+    for a in present_agents:
+        if a not in agents:
+            agents.append(a)
+
+    n_agents = len(agents)
+    matrix = np.full((n_agents, n_agents), np.nan)
+    cell_texts = [["" for _ in range(n_agents)] for _ in range(n_agents)]
+
+    for i, a_row in enumerate(agents):
+        for j, b_col in enumerate(agents):
+            if i == j:
+                matrix[i, j] = 50.0  # Neutral baseline on diagonal
+                cell_texts[i][j] = "—"
+                continue
+
+            pair_games = [
+                r for r in rows
+                if r["agents"] in (f"{a_row} vs {b_col}", f"{b_col} vs {a_row}")
+            ]
+            if not pair_games:
+                continue
+
+            wins = sum(1 for r in pair_games if r["winner"].strip() == a_row)
+            draws = sum(1 for r in pair_games if r["winner"].strip() == "Draw")
+            losses = sum(1 for r in pair_games if r["winner"].strip() == b_col)
+            tot = len(pair_games)
+
+            score_pct = ((wins + 0.5 * draws) / tot) * 100.0 if tot > 0 else 0.0
+            matrix[i, j] = score_pct
+            cell_texts[i][j] = f"{wins}-{draws}-{losses}\n({score_pct:.1f}%)"
 
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
-    fig, ax = plt.subplots(figsize=(8.0, 6.2), dpi=300)
+    fig, ax = plt.subplots(figsize=(8.8, 6.6), dpi=300)
 
-    # Render heatmap with modern colormap
     cax = ax.imshow(matrix, cmap="Blues", vmin=0, vmax=100)
     cbar = fig.colorbar(cax, ax=ax, fraction=0.046, pad=0.04)
-    cbar.set_label("Row Agent Win Rate (%)", fontsize=10, fontweight="semibold")
+    cbar.set_label("Row Agent Score (%) [Wins + 0.5 × Draws]", fontsize=10, fontweight="semibold")
 
-    # Set axis ticks and labels
-    ax.set_xticks(range(len(agents)))
-    ax.set_yticks(range(len(agents)))
-    ax.set_xticklabels(agents, rotation=35, ha="right", fontsize=9.5, fontweight="medium")
+    ax.set_xticks(range(n_agents))
+    ax.set_yticks(range(n_agents))
+    ax.set_xticklabels(agents, rotation=30, ha="right", fontsize=9.5, fontweight="medium")
     ax.set_yticklabels(agents, fontsize=9.5, fontweight="medium")
 
-    # Annotate cell values
-    for i in range(len(agents)):
-        for j in range(len(agents)):
+    for i in range(n_agents):
+        for j in range(n_agents):
             val = matrix[i, j]
-            text_color = "white" if val >= 60 else "#0f172a"
+            text = cell_texts[i][j]
+            text_color = "white" if (not np.isnan(val) and val >= 60) else "#0f172a"
             ax.text(
                 j,
                 i,
-                f"{val:.1f}%",
+                text,
                 ha="center",
                 va="center",
                 color=text_color,
-                fontsize=9.5,
+                fontsize=9.0,
                 fontweight="bold",
             )
 
     ax.set_title(
-        "Figure 3: Tournament Win Rates (20 games per pair)\nDraws count as 0 for both agents",
+        "Figure 3: Round-robin results (20 games per pair)",
         fontsize=13,
         fontweight="bold",
         pad=16,
@@ -302,83 +304,134 @@ def plot_winrate_matrix_heatmap(
     return output_path
 
 
-def plot_memory_footprint(
-    data: Optional[Dict[str, Any]] = None,
-    output_path: str = "docs/figures/fig4_peak_memory_footprint.png",
+def plot_mcts_vs_alphabeta(
+    csv_path: str = "docs/results/mcts_vs_alphabeta.csv",
+    output_path: str = "docs/figures/fig6_mcts_strength.png",
 ) -> str:
-    """Plot peak memory consumption across agents.
+    """Plot MCTS performance vs Alpha-Beta by simulation budget from mcts_vs_alphabeta.csv.
 
-    Figure 4: Peak Memory Footprint (tracemalloc Heap Allocation).
+    Figure 5/6: MCTS vs Alpha-Beta (depth 4, heuristic) across simulation budgets.
+    Stacked bars for outcomes (Wins, Draws, Losses) and line for average game length when lost.
     """
+    if not os.path.exists(csv_path):
+        raise FileNotFoundError(f"Missing required CSV file: {csv_path}")
+
     _setup_style()
-    metrics = data or DEFAULT_MEMORY_METRICS
-    agents = metrics["agents"]
-    mem_kb = metrics["peak_memory_kb"]
+
+    budgets = []
+    games = []
+    mcts_wins = []
+    draws = []
+    mcts_losses = []
+    avg_plies_lost = []
+
+    with open(csv_path, mode="r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            budgets.append(str(row["simulations"]))
+            games.append(int(row["games"]))
+            mcts_wins.append(int(row["mcts_wins"]))
+            draws.append(int(row["draws"]))
+            mcts_losses.append(int(row["mcts_losses"]))
+            avg_plies_lost.append(float(row["avg_plies_when_lost"]))
 
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
-    fig, ax = plt.subplots(figsize=(8.5, 5.0), dpi=300)
+    fig, (ax_bar, ax_len) = plt.subplots(1, 2, figsize=(12, 5.0), dpi=300)
 
-    # Distinct bar colors by algorithm family
-    bar_colors = [
-        COLOR_RANDOM,
-        COLOR_MINIMAX,
-        COLOR_ALPHABETA,
-        COLOR_ITERATIVE,
-        COLOR_MCTS,
-        "#059669",  # Darker emerald for MCTS 1000
-    ]
+    # Left panel: Stacked outcomes
+    x_indices = np.arange(len(budgets))
+    bar_width = 0.55
 
-    bars = ax.bar(agents, mem_kb, color=bar_colors, width=0.55, edgecolor="#475569", linewidth=0.8)
+    bottom_draws = mcts_wins
+    bottom_losses = [w + d for w, d in zip(mcts_wins, draws)]
 
-    # Annotate bar values
-    for bar in bars:
-        h = bar.get_height()
-        ax.text(
-            bar.get_x() + bar.get_width() / 2,
-            h + (max(mem_kb) * 0.02),
-            f"{h:.1f} KB",
+    ax_bar.bar(x_indices, mcts_wins, bar_width, label="MCTS Wins", color=COLOR_MCTS)
+    ax_bar.bar(x_indices, draws, bar_width, bottom=bottom_draws, label="Draws", color="#94a3b8")
+    ax_bar.bar(x_indices, mcts_losses, bar_width, bottom=bottom_losses, label="MCTS Losses", color=COLOR_MINIMAX)
+
+    for i in range(len(budgets)):
+        w = mcts_wins[i]
+        d = draws[i]
+        l = mcts_losses[i]
+        if w > 0:
+            ax_bar.text(i, w / 2, f"{w}", ha="center", va="center", color="white", fontweight="bold", fontsize=9.5)
+        if d > 0:
+            ax_bar.text(i, w + d / 2, f"{d}", ha="center", va="center", color="white", fontweight="bold", fontsize=9.5)
+        if l > 0:
+            ax_bar.text(i, w + d + l / 2, f"{l}", ha="center", va="center", color="white", fontweight="bold", fontsize=9.5)
+
+    ax_bar.set_xticks(x_indices)
+    ax_bar.set_xticklabels(budgets, fontweight="medium")
+    ax_bar.set_xlabel("MCTS Simulations per Move", fontsize=11, fontweight="semibold", color="#1e293b")
+    ax_bar.set_ylabel("Number of Games", fontsize=11, fontweight="semibold", color="#1e293b")
+    ax_bar.set_title("Match Outcomes vs. Alpha-Beta (d=4)", fontsize=12, fontweight="bold", pad=10)
+    ax_bar.set_ylim(0, max(games) * 1.15)
+    ax_bar.legend(loc="upper left", frameon=True, facecolor="#f8fafc", edgecolor="#cbd5e1", fontsize=9.5)
+    ax_bar.grid(True, axis="y")
+
+    # Right panel: Average plies when lost
+    ax_len.plot(x_indices, avg_plies_lost, marker="o", color=COLOR_ALPHABETA, linewidth=2.2, markersize=7)
+    for i, txt in enumerate(avg_plies_lost):
+        ax_len.annotate(
+            f"{txt:.1f} plies",
+            (x_indices[i], avg_plies_lost[i]),
+            textcoords="offset points",
+            xytext=(0, 10),
             ha="center",
-            va="bottom",
-            fontsize=9,
             fontweight="bold",
-            color="#0f172a",
+            fontsize=9.5,
         )
 
-    ax.set_title(
-        "Figure 4: Peak Heap Memory Consumption per Algorithm (tracemalloc)",
+    ax_len.set_xticks(x_indices)
+    ax_len.set_xticklabels(budgets, fontweight="medium")
+    ax_len.set_xlabel("MCTS Simulations per Move", fontsize=11, fontweight="semibold", color="#1e293b")
+    ax_len.set_ylabel("Average Plies in Lost Games", fontsize=11, fontweight="semibold", color="#1e293b")
+    ax_len.set_title("Resistance: Game Length When Lost", fontsize=12, fontweight="bold", pad=10)
+    ax_len.set_ylim(0, max(avg_plies_lost) * 1.25)
+    ax_len.grid(True)
+
+    fig.suptitle(
+        "Figure 5/6: MCTS Scaling vs. Alpha-Beta (d=4, Heuristic)",
         fontsize=13,
         fontweight="bold",
-        pad=14,
+        y=0.98,
         color="#0f172a",
     )
-    ax.set_ylabel("Peak Memory Allocation (KiB)", fontsize=11, fontweight="semibold", color="#1e293b")
-    ax.set_xticks(range(len(agents)))
-    ax.set_xticklabels(agents, rotation=25, ha="right", fontsize=9.5, fontweight="medium")
-    ax.set_ylim(0, max(mem_kb) * 1.18)
-    ax.grid(True, axis="y")
-
-    # Add insight box
-    ax.text(
-        0.03,
-        0.88,
-        "Alpha-Beta operates in O(d) recursion stack space.\nMCTS dynamically allocates tree nodes O(N).",
-        transform=ax.transAxes,
-        fontsize=8.5,
-        verticalalignment="top",
-        bbox=dict(boxstyle="round,pad=0.5", facecolor="#f8fafc", edgecolor="#cbd5e1"),
-    )
-
     plt.tight_layout()
     fig.savefig(output_path, dpi=300)
     plt.close(fig)
     return output_path
 
 
-def generate_all_figures(output_dir: str = "docs/figures") -> List[str]:
-    """Generate and save all 4 benchmark figures to the specified directory."""
+# Aliases for convenience
+plot_mcts_strength = plot_mcts_vs_alphabeta
+plot_mcts_budget_scaling = plot_mcts_vs_alphabeta
+
+
+def generate_all_figures(
+    output_dir: str = "docs/figures",
+    results_dir: str = "docs/results",
+) -> List[str]:
+    """Generate all publication benchmark figures from CSV results files."""
     os.makedirs(output_dir, exist_ok=True)
-    f1 = plot_execution_time_vs_depth(output_path=os.path.join(output_dir, "fig1_execution_time_vs_depth.png"))
-    f2 = plot_nodes_expanded_log_scale(output_path=os.path.join(output_dir, "fig2_nodes_expanded_log_scale.png"))
-    f3 = plot_winrate_matrix_heatmap(output_path=os.path.join(output_dir, "fig3_tournament_winrate_heatmap.png"))
-    f4 = plot_memory_footprint(output_path=os.path.join(output_dir, "fig4_peak_memory_footprint.png"))
-    return [f1, f2, f3, f4]
+    depth_csv = os.path.join(results_dir, "depth_scaling.csv")
+    tournament_csv = os.path.join(results_dir, "tournament.csv")
+    mcts_csv = os.path.join(results_dir, "mcts_vs_alphabeta.csv")
+
+    f1 = plot_execution_time_vs_depth(
+        csv_path=depth_csv,
+        output_path=os.path.join(output_dir, "fig1_execution_time_vs_depth.png"),
+    )
+    f2 = plot_nodes_expanded_log_scale(
+        csv_path=depth_csv,
+        output_path=os.path.join(output_dir, "fig2_nodes_expanded_log_scale.png"),
+    )
+    f3 = plot_winrate_matrix_heatmap(
+        csv_path=tournament_csv,
+        output_path=os.path.join(output_dir, "fig3_tournament_winrate_heatmap.png"),
+    )
+    f6 = plot_mcts_vs_alphabeta(
+        csv_path=mcts_csv,
+        output_path=os.path.join(output_dir, "fig6_mcts_strength.png"),
+    )
+    return [f1, f2, f3, f6]
